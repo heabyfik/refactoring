@@ -7,21 +7,21 @@ import pygame
 from pygame.locals import *
 
 from . import interface, objects, layouts
-from . import colors
+from . import colors, music
 
-"""
-Всё отвечающее за игру
-"""
 
 def terminate(player):
-    # saving current state
+    _save_current_state(player)
+    pygame.quit()
+    sys.exit()
+
+
+def _save_current_state(player):
     handler = open("../stats/last_player.txt", 'w')
     handler.write(player.name)
     handler.close()
-    player.save_current_state()
 
-    pygame.quit()
-    sys.exit()
+    player.save_current_state()
 
 
 def wait_for_player_to_press_key(player):
@@ -30,8 +30,6 @@ def wait_for_player_to_press_key(player):
             if event.type == QUIT:
                 terminate(player)
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:  # pressing escape quits
-                    return
                 return
 
 
@@ -58,7 +56,6 @@ def story_loop(window_surface, level_number, prefix, player):
     window_surface.fill(colors.BLACK)
 
     image = pygame.image.load('../drawable/sprites/cat_hero/skins/cat' + str(player.current_skin) + '.png')
-
     image_surface = pygame.transform.scale(image, (300, 700))
     rect = image_surface.get_rect()
 
@@ -97,7 +94,6 @@ def story_loop(window_surface, level_number, prefix, player):
 
 
 def enemy_switch_by_level(level_number):
-    # set up enemies
     if level_number == 2:
         return objects.ChildrenEnemy(level_number)
     elif level_number == 3:
@@ -120,14 +116,6 @@ def game_loop(window_surface, level_number, player):
     except Exception:
         background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
     background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-
-    # set up music
-    game_over_sound = pygame.mixer.Sound('../sound/game_over.wav')
-    damage_sound = pygame.mixer.Sound('../sound/short_tracks/damage.wav')
-    victory_sound = pygame.mixer.Sound('../sound/short_tracks/victory.wav')
-    coin_sound = pygame.mixer.Sound('../sound/short_tracks/coin.wav')
-    health_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
-    attack_sound = pygame.mixer.Sound('../sound/short_tracks/attack_1' + ".wav")
 
     try:
         pygame.mixer.music.load('../sound/background_music/music' + str(level_number) + ".mp3")
@@ -235,6 +223,7 @@ def game_loop(window_surface, level_number, player):
                         pygame.mixer.music.stop()
                         pygame.mouse.set_visible(True)
                         return False
+
                 if event.key == K_LEFT or event.key == ord('a'):
                     move_left = False
                 if event.key == K_RIGHT or event.key == ord('d'):
@@ -260,7 +249,7 @@ def game_loop(window_surface, level_number, player):
                 if enemy.rect.colliderect(bullet.rect):
                     enemy.life -= bullet.power
                     bullet.life -= 1
-                    attack_sound.play()
+                    music.attack_sound.play()
 
         # hitting hero:
         for enemy in enemies:
@@ -268,7 +257,7 @@ def game_loop(window_surface, level_number, player):
                 meow_hero.life -= 1
                 meow_hero.invulnerability += 1
                 enemies.remove(enemy)
-                damage_sound.play()
+                music.damage_sound.play()
 
         # hitting hero by bullets
         for bullet in enemy_bullets:
@@ -276,14 +265,14 @@ def game_loop(window_surface, level_number, player):
                 meow_hero.life -= 1
                 enemy_bullets.remove(bullet)
                 meow_hero.invulnerability += 1
-                damage_sound.play()
+                music.damage_sound.play()
 
         # collecting bonuses:
         for bonus in bonuses:
             if meow_hero.rect.colliderect(bonus.rect):
                 if bonus.bonus_type == "Coin":
                     score += 1000
-                    coin_sound.play()
+                    music.coin_sound.play()
                 bonuses.remove(bonus)
 
         # check if bullet is out of screen
@@ -345,7 +334,7 @@ def game_loop(window_surface, level_number, player):
     if victory:
         score = score + meow_hero.life*1000
         # checking for new record
-        victory_sound.play()
+        music.victory_sound.play()
 
         new_skin = False
         if level_number in config.SKIN_LEVELS and level_number not in player.skins:
@@ -363,13 +352,13 @@ def game_loop(window_surface, level_number, player):
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, True, new_skin)
         else:
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, False, new_skin)
-        victory_sound.stop()
+        music.victory_sound.stop()
         if level_number+1 not in player.levels:
             player.levels.append(int(level_number+1))
     else:
-        game_over_sound.play()
+        music.game_over_sound.play()
         layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        game_over_sound.stop()
+        music.game_over_sound.stop()
 
     pygame.display.update()
 
@@ -388,15 +377,6 @@ def boss_game_loop(window_surface, level_number, player):
     except Exception:
         background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
     background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-
-    # set up music
-    game_over_sound = pygame.mixer.Sound('../sound/game_over.wav')
-    damage_sound = pygame.mixer.Sound('../sound/short_tracks/damage.wav')
-    victory_sound = pygame.mixer.Sound('../sound/short_tracks/victory.wav')
-    coin_sound = pygame.mixer.Sound('../sound/short_tracks/coin.wav')
-    health_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
-    new_top_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
-    attack_sound = pygame.mixer.Sound('../sound/short_tracks/attack_1' + ".wav")
 
     try:
         pygame.mixer.music.load('../sound/background_music/music' + str(level_number) + ".mp3")
@@ -533,6 +513,7 @@ def boss_game_loop(window_surface, level_number, player):
                         pygame.mixer.music.stop()
                         pygame.mouse.set_visible(True)
                         return False
+
                 if event.key == K_LEFT or event.key == ord('a'):
                     move_left = False
                 if event.key == K_RIGHT or event.key == ord('d'):
@@ -558,14 +539,14 @@ def boss_game_loop(window_surface, level_number, player):
                 if enemy.rect.colliderect(bullet.rect):
                     enemy.life -= bullet.power
                     bullet.life -= 1
-                    attack_sound.play()
+                    music.attack_sound.play()
 
         # hitting hero:
         for enemy in enemies:
             if meow_hero.rect.colliderect(enemy.rect) and not meow_hero.invulnerability:
                 meow_hero.life -= 1
                 meow_hero.invulnerability += 1
-                damage_sound.play()
+                music.damage_sound.play()
 
         # hitting hero by bullets
         for bullet in enemy_bullets:
@@ -573,14 +554,14 @@ def boss_game_loop(window_surface, level_number, player):
                 meow_hero.life -= 1
                 enemy_bullets.remove(bullet)
                 meow_hero.invulnerability += 1
-                damage_sound.play()
+                music.damage_sound.play()
 
         # collecting bonuses:
         for bonus in bonuses:
             if meow_hero.rect.colliderect(bonus.rect):
                 if bonus.bonus_type == "Coin":
                     score += 1000
-                    coin_sound.play()
+                    music.coin_sound.play()
                 bonuses.remove(bonus)
 
         # check if bullet is out of screen
@@ -649,7 +630,7 @@ def boss_game_loop(window_surface, level_number, player):
     if victory:
         # checking for new record
         score = int((score + meow_hero.life*1000)*100/main_timer)
-        victory_sound.play()
+        music.victory_sound.play()
 
         new_skin = False
         if level_number in config.SKIN_LEVELS and level_number not in player.skins:
@@ -667,13 +648,13 @@ def boss_game_loop(window_surface, level_number, player):
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, True, new_skin)
         else:
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, False, new_skin)
-        victory_sound.stop()
-        if level_number+1 not in player.levels:
-            player.levels.append(int(level_number+1))
+        music.victory_sound.stop()
+        if level_number + 1 not in player.levels:
+            player.levels.append(int(level_number + 1))
     else:
-        game_over_sound.play()
+        music. game_over_sound.play()
         layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        game_over_sound.stop()
+        music.game_over_sound.stop()
 
     pygame.display.update()
 
