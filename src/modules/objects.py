@@ -412,8 +412,6 @@ class Committee(Boss):
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/komissia3.png')
 
-        # self.life = 322
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -629,7 +627,6 @@ class OlegAlexeevich(Boss):
 class DiplomCommittee(Teacher):
     def __init__(self, name, level):
         super().__init__(name, level)
-        # self.life = 250
 
         self.reload_time = 3
 

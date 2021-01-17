@@ -6,7 +6,6 @@ import pygame
 Элементы интерфейса
 """
 
-
 class Button:
     def __init__(self, x, y, w, h, text='Hello', is_off=False):
         self.x = int(x)
@@ -127,9 +126,6 @@ class InputBox:
             self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
         if event.type == pygame.KEYDOWN:
             if self.active:
-                # if event.key == pygame.K_RETURN:
-                #     print(self.text)
-                #     self.text = ''
                 if event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:

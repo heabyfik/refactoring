@@ -35,31 +35,6 @@ def terminate():
 
 
 def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
-    # # setup socket and logger
-    # PORT = layouts.giving_port_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
-    #
-    # # socket.setdefaulttimeout(1)
-    # sock = socket.socket()
-    #
-    # sock.bind((HOST, PORT))
-    # sock.listen(100)
-    # sock.settimeout(TIMEOUT_TIME)
-    #
-    # logger = logging.getLogger("Fucking Server")
-    # logger.setLevel(logging.INFO)
-    #
-    # fh = logging.FileHandler("server_info.log")
-    #
-    # # pretty formatting
-    # formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s')
-    # fh.setFormatter(formatter)
-    #
-    # # add handler to logger object
-    # logger.addHandler(fh)
-    #
-    # print("Serving on", PORT)
-    # logger.info('Start serving on %s' % (PORT))
-
     # setup game
     pygame.mouse.set_visible(False)
 
@@ -147,7 +122,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
         for event in pygame.event.get():
             if event.type == QUIT:
                 print("Goodbye")
-                # logger.info('Connection closed, game over')
                 terminate()
 
             if event.type == pygame.USEREVENT:  # time tick
@@ -221,13 +195,8 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                         pygame.mixer.music.stop()
                         pygame.mouse.set_visible(True)
                         return False
-            # TEST #
+
             if event.type == KEYDOWN:
-                # if event.key == K_SPACE:
-                #     attack_sound.play()
-                #     bullet = objects.Bullet(meow_hero1.weapon_power, WINDOW_WIDTH/30, WINDOW_HEIGHT/30)
-                #     bullet.rect.move_ip(meow_hero1.rect.left, meow_hero1.rect.top)
-                #     bullets.append(bullet)
                 if event.key == ord('a'):
                     move_right1 = False
                     move_left1 = True
@@ -250,14 +219,8 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                     move_up1 = False
                 if event.key == ord('s'):
                     move_down1 = False
-                # TEST #
 
             if event.type == KEYDOWN:
-                # if event.key == K_SPACE:
-                #     attack_sound.play()
-                #     bullet = objects.Bullet(meow_hero1.weapon_power, WINDOW_WIDTH/30, WINDOW_HEIGHT/30)
-                #     bullet.rect.move_ip(meow_hero1.rect.left, meow_hero1.rect.top)
-                #     bullets.append(bullet)
                 if event.key == K_LEFT:
                     move_right2 = False
                     move_left2 = True
@@ -280,65 +243,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                     move_up2 = False
                 if event.key == K_DOWN:
                     move_down2 = False
-                # TEST #
-	# were able with controller	
-
-        # handling socket
-        # data = []
-        # try:
-        #     conn, address = sock.accept()
-        #     data = conn.recv(1024).decode()
-        #     print(data)
-        #     logger.info("Income data: %s" % (data))
-        #     data = data.split()
-        #     conn.close()
-        #
-        # except Exception:  # exception if timeout
-        #     pass
-
-        # handle data events
-        # if data:
-        #     # handle first player
-        #     if "1" in data:
-        #         if "R" in data:
-        #             move_left1 = False
-        #             move_right1 = True
-        #         if "L" in data:
-        #             move_left1 = True
-        #             move_right1 = False
-        #         if "U" in data:
-        #             move_down1 = False
-        #             move_up1 = True
-        #         if "D" in data:
-        #             move_down1 = True
-        #             move_up1 = False
-        #         if "SH" in data:
-        #             move_left1 = False
-        #             move_right1 = False
-        #         if "SV" in data:
-        #             move_down1 = False
-        #             move_up1 = False
-        #
-        #     # handle second player
-        #     elif "2" in data:
-        #         if "R" in data:
-        #             move_left2 = False
-        #             move_right2 = True
-        #         if "L" in data:
-        #             move_left2 = True
-        #             move_right2 = False
-        #         if "U" in data:
-        #             move_down2 = False
-        #             move_up2 = True
-        #         if "D" in data:
-        #             move_down2 = True
-        #             move_up2 = False
-        #         if "SH" in data:
-        #             move_left2 = False
-        #             move_right2 = False
-        #         if "SV" in data:
-        #             move_down2 = False
-        #             move_up2 = False
 
         # move the first player around
         if move_left1 and meow_hero1.rect.left > 0:
@@ -378,8 +282,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                     bullet.rect.move_ip(meow.rect.left, meow.rect.top)
                     bullet.x = int(bullet.speed/3)*(-1)
                     bullets.append(bullet)
-
-                # attack_sound.play()
 
         # hitting enemy
         for enemy in enemies:
@@ -513,7 +415,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
         pygame.display.update()
         main_clock.tick(FPS)
 
-    # logger.info('Connection closed, game over')
     pygame.mouse.set_visible(True)
     pygame.mouse.set_visible(True)
 
