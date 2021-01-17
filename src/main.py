@@ -1,32 +1,23 @@
 import pygame
 
-from modules import interface, layouts, client, game
 from pygame.locals import *
 
-# constants
-WINDOW_WIDTH = 1600
-WINDOW_HEIGHT = 900
+from modules import interface, layouts, client, game, colors, config
 
 # constant BG
 background_image_main = pygame.image.load("../drawable/backgrounds/main_menu5.jpg")
-background_image_main = pygame.transform.scale(background_image_main, (WINDOW_WIDTH, WINDOW_HEIGHT))
+background_image_main = pygame.transform.scale(background_image_main, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
 background_image_levels = pygame.image.load("../drawable/backgrounds/main_menu5.jpg")
-background_image_levels = pygame.transform.scale(background_image_levels, (WINDOW_WIDTH, WINDOW_HEIGHT))
+background_image_levels = pygame.transform.scale(background_image_levels, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
 
-# colors
-COLOR_WHITE = (255, 255, 255)
-COLOR_BLACK = (0, 0, 0)
-COLOR_BRIGHT_GREY = (200, 200, 200) 
-COLOR_RED = (255, 0, 0)  
- 
 
 def init_window(full_screen=False):  # set up pygame, the window, and the mouse cursor
     pygame.init()
 
     if full_screen:
-        window_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.FULLSCREEN)
+        window_surface = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT), pygame.FULLSCREEN)
     else:
-        window_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        window_surface = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
 
     window_surface.blit(background_image_main, [0, 0])
     pygame.display.set_caption('Meow Hero')
@@ -39,19 +30,19 @@ def draw_level_buttons(window_surface, player):
 
     for i in range(12):
         if i + 1 in player.levels:
-            button = interface.Button(WINDOW_WIDTH / 2 + (i % 3) * (WINDOW_WIDTH / 8 + 40) + 50,
-                                      WINDOW_HEIGHT / 12 + int(i / 3) * (WINDOW_HEIGHT / 8 + 70),
-                                      WINDOW_WIDTH / 8, WINDOW_HEIGHT / 6, str(i + 1))
+            button = interface.Button(config.WINDOW_WIDTH / 2 + (i % 3) * (config.WINDOW_WIDTH / 8 + 40) + 50,
+                                      config.WINDOW_HEIGHT / 12 + int(i / 3) * (config.WINDOW_HEIGHT / 8 + 70),
+                                      config.WINDOW_WIDTH / 8, config.WINDOW_HEIGHT / 6, str(i + 1))
             button.font = pygame.font.SysFont(None, 64)
         else:
-            button = interface.Button(WINDOW_WIDTH / 2 + (i % 3) * (WINDOW_WIDTH / 8 + 40) + 50,
-                                      WINDOW_HEIGHT / 12 + int(i / 3) * (WINDOW_HEIGHT / 8 + 70),
-                                      WINDOW_WIDTH / 8, WINDOW_HEIGHT / 6, str(i + 1), True)
+            button = interface.Button(config.WINDOW_WIDTH / 2 + (i % 3) * (config.WINDOW_WIDTH / 8 + 40) + 50,
+                                      config.WINDOW_HEIGHT / 12 + int(i / 3) * (config.WINDOW_HEIGHT / 8 + 70),
+                                      config.WINDOW_WIDTH / 8, config.WINDOW_HEIGHT / 6, str(i + 1), True)
             button.font = pygame.font.SysFont(None, 64)
 
         buttons.append(button)
 
-    button_back = interface.Button(20, 20, WINDOW_WIDTH / 10, WINDOW_HEIGHT / 10, "Back")
+    button_back = interface.Button(20, 20, config.WINDOW_WIDTH / 10, config.WINDOW_HEIGHT / 10, "Back")
     buttons.append(button_back)
 
     return buttons
@@ -70,7 +61,6 @@ def levels_menu(window_surface, player):
                     return
 
             if event.type == QUIT:
-                print("Goodbye")
                 game.terminate(player)
 
             for button in buttons:
@@ -119,20 +109,20 @@ def main_menu(window_surface):     # show the "Main menu" screen
         player = interface.load_player_by_path("../stats/players/" + "Test Player" + ".json")
 
     # creating text and buttons
-    greeting_text = interface.TextView(font_1, COLOR_BLACK, 15, 15, "Hello, " + player_name + "!")
-    game_title_text = interface.TextView(font_0, COLOR_BLACK, WINDOW_WIDTH/2, 50, "MEOW HERO")
-    not_you_text_button = interface.TextView(font_2, COLOR_RED, WINDOW_WIDTH/5, 90, "Not you, dude?")
+    greeting_text = interface.TextView(font_1, colors.BLACK, 15, 15, "Hello, " + player_name + "!")
+    game_title_text = interface.TextView(font_0, colors.BLACK, config.WINDOW_WIDTH/2, 50, "MEOW HERO")
+    not_you_text_button = interface.TextView(font_2, colors.RED, config.WINDOW_WIDTH/5, 90, "Not you, dude?")
 
-    button_single = interface.Button(WINDOW_WIDTH/2+100, WINDOW_HEIGHT/4,
-                                   WINDOW_WIDTH/3, WINDOW_HEIGHT/8, "1 Player")
-    button_two = interface.Button(WINDOW_WIDTH/2+100, WINDOW_HEIGHT/2,
-                                WINDOW_WIDTH/3, WINDOW_HEIGHT/8, "2 Players")
-    button_quit = interface.Button(WINDOW_WIDTH/2+100, 3*WINDOW_HEIGHT/4,
-                                 WINDOW_WIDTH/3, WINDOW_HEIGHT/8, "Quit")
+    button_single = interface.Button(config.WINDOW_WIDTH/2+100, config.WINDOW_HEIGHT/4,
+                                   config.WINDOW_WIDTH/3, config.WINDOW_HEIGHT/8, "1 Player")
+    button_two = interface.Button(config.WINDOW_WIDTH/2+100, config.WINDOW_HEIGHT/2,
+                                config.WINDOW_WIDTH/3, config.WINDOW_HEIGHT/8, "2 Players")
+    button_quit = interface.Button(config.WINDOW_WIDTH/2+100, 3*config.WINDOW_HEIGHT/4,
+                                 config.WINDOW_WIDTH/3, config.WINDOW_HEIGHT/8, "Quit")
 
-    button_stats = interface.Button(50, 140, WINDOW_WIDTH/8, WINDOW_HEIGHT/7, "Stats")
-    button_skins = interface.Button(260, 140, WINDOW_WIDTH/8, WINDOW_HEIGHT/7, "Skins")
-    button_future = interface.Button(470, 140, WINDOW_WIDTH/8, WINDOW_HEIGHT/7, "Info")
+    button_stats = interface.Button(50, 140, config.WINDOW_WIDTH/8, config.WINDOW_HEIGHT/7, "Stats")
+    button_skins = interface.Button(260, 140, config.WINDOW_WIDTH/8, config.WINDOW_HEIGHT/7, "Skins")
+    button_future = interface.Button(470, 140, config.WINDOW_WIDTH/8, config.WINDOW_HEIGHT/7, "Info")
 
     drawable = list()
     drawable.append(greeting_text)
@@ -150,7 +140,6 @@ def main_menu(window_surface):     # show the "Main menu" screen
             mouse_pos = pygame.mouse.get_pos()
 
             if event.type == QUIT:
-                print("Goodbye")
                 game.terminate(player)
 
             if event.type == KEYUP:
@@ -162,24 +151,24 @@ def main_menu(window_surface):     # show the "Main menu" screen
                     levels_menu(window_surface, player)
             elif button_two.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    client.two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    client.two_players_mode(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
             elif button_quit.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     game.terminate(player)
             elif not_you_text_button.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    player = layouts.create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    player = layouts.create_profile_layout(window_surface, player, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
                     greeting_text.text = "Hello, " + player.name + "!"
             elif button_stats.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    layouts.stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    layouts.stats_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
             elif button_skins.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    player = layouts.change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    player = layouts.change_skin_layout(window_surface, player, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
             elif button_future.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # I don't know why I need this button
-                    layouts.future_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    layouts.future_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
 
         # drawing objects
         window_surface.blit(background_image_main, [0, 0])

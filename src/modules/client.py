@@ -7,21 +7,12 @@ import pygame
 from pygame.locals import *
 
 from . import objects, layouts, interface
-from . import colors
+from . import colors, config
 
 """
 Game loop для двух игроков.
 Игроки управляются с контроллера.
 """
-
-# socket magic
-HOST = '0.0.0.0'
-PORT = 9027
-
-# magic
-FPS = 38
-TIMEOUT_TIME = 0.01
-ENEMY_MAX_COUNT = 16
 
 
 def terminate():
@@ -130,7 +121,7 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                         available_bonus_type += 1
 
                 # spawn enemy
-                if len(enemies) < ENEMY_MAX_COUNT and not freeze_bonus:
+                if len(enemies) < config.ENEMY_MAX_COUNT and not freeze_bonus:
                     dice = random.random()
                     if dice < enemy_spawn_probability:
                         level = random.randint(1, available_enemy_level)
@@ -407,7 +398,7 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
             running = False
 
         pygame.display.update()
-        main_clock.tick(FPS)
+        main_clock.tick(config.FPS)
 
     pygame.mouse.set_visible(True)
     pygame.mouse.set_visible(True)

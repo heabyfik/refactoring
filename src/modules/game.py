@@ -13,16 +13,6 @@ from . import colors
 Всё отвечающее за игру
 """
 
-# magic
-WINDOW_WIDTH = 1600
-WINDOW_HEIGHT = 900
-
-FPS = 40
-ENEMY_MAX_COUNT = 40
-
-SKIN_LEVELS = [1, 6, 8, 9, 10, 12]
-
-
 def terminate(player):
     # saving current state
     handler = open("../stats/last_player.txt", 'w')
@@ -63,7 +53,7 @@ def story_loop(window_surface, level_number, prefix, player):
     handler.close()
 
     font = pygame.font.SysFont(None, 60)
-    text_view = interface.TextView(font, colors.WHITE, WINDOW_WIDTH/6+50, WINDOW_HEIGHT/10)
+    text_view = interface.TextView(font, colors.WHITE, config.WINDOW_WIDTH/6+50, config.WINDOW_HEIGHT/10)
 
     window_surface.fill(colors.BLACK)
 
@@ -129,7 +119,7 @@ def game_loop(window_surface, level_number, player):
         background_image_in_game = pygame.image.load("../drawable/backgrounds/background" + str(level_number) + ".jpg")
     except Exception:
         background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
-    background_image_in_game = pygame.transform.scale(background_image_in_game, (WINDOW_WIDTH, WINDOW_HEIGHT))
+    background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
 
     # set up music
     game_over_sound = pygame.mixer.Sound('../sound/game_over.wav')
@@ -148,12 +138,12 @@ def game_loop(window_surface, level_number, player):
     font = pygame.font.SysFont(None, 60)
     score_text = interface.TextView(font, colors.WHITE, 10, 0)
     top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
-    timer_text = interface.TextView(font, colors.WHITE, 10*WINDOW_WIDTH/12, 10)
+    timer_text = interface.TextView(font, colors.WHITE, 10*config.WINDOW_WIDTH/12, 10)
 
     meow_hero = objects.MeowHero(player.current_skin)
-    meow_hero.rect.move_ip(int(WINDOW_WIDTH/2), 7*int(WINDOW_HEIGHT/8))
+    meow_hero.rect.move_ip(int(config.WINDOW_WIDTH/2), 7*int(config.WINDOW_HEIGHT/8))
 
-    health_points = objects.Health(1, WINDOW_WIDTH/30, WINDOW_HEIGHT/30)
+    health_points = objects.Health(1, config.WINDOW_WIDTH/30, config.WINDOW_HEIGHT/30)
 
     bullets = []
     enemies = []
@@ -216,7 +206,7 @@ def game_loop(window_surface, level_number, player):
                 # spawn bonuses by time
                 if main_timer % 10 == 0:
                     bonus = objects.Bonus("Coin", level_number)
-                    bonus.rect.move_ip(random.randint(0, WINDOW_WIDTH), random.randint(200, WINDOW_HEIGHT))
+                    bonus.rect.move_ip(random.randint(0, config.WINDOW_WIDTH), random.randint(200, config.WINDOW_HEIGHT))
                     bonuses.append(bonus)
 
             if event.type == KEYDOWN:
@@ -239,7 +229,7 @@ def game_loop(window_surface, level_number, player):
 
             if event.type == KEYUP:
                 if event.key == K_ESCAPE:
-                    quit_state = layouts.interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    quit_state = layouts.interruption_menu(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
                     if quit_state:
                         print("Goodbye")
                         pygame.mixer.music.stop()
@@ -257,11 +247,11 @@ def game_loop(window_surface, level_number, player):
         # move the player around
         if move_left and meow_hero.rect.left > 0:
             meow_hero.move(-1, 0)
-        if move_right and meow_hero.rect.right < WINDOW_WIDTH:
+        if move_right and meow_hero.rect.right < config.WINDOW_WIDTH:
             meow_hero.move(1, 0)
         if move_up and meow_hero.rect.top > 0:
             meow_hero.move(0, -1)
-        if move_down and meow_hero.rect.bottom < WINDOW_HEIGHT:
+        if move_down and meow_hero.rect.bottom < config.WINDOW_HEIGHT:
             meow_hero.move(0, 1)
 
         # hitting enemy
@@ -322,7 +312,7 @@ def game_loop(window_surface, level_number, player):
         # draw enemies
         for enemy in enemies:
             enemy.move()
-            if enemy.rect.top > WINDOW_HEIGHT or enemy.rect.right < 0 or enemy.rect.left > WINDOW_WIDTH or enemy.life <= 0:
+            if enemy.rect.top > WINDOW_HEIGHT or enemy.rect.right < 0 or enemy.rect.left > config.WINDOW_WIDTH or enemy.life <= 0:
                 enemies.remove(enemy)
                 score += 100 * enemy.level
             enemy.draw(window_surface)
@@ -347,7 +337,7 @@ def game_loop(window_surface, level_number, player):
             victory = False
 
         pygame.display.update()
-        main_clock.tick(FPS)
+        main_clock.tick(config.FPS)
 
     pygame.mixer.music.stop()
     pygame.mouse.set_visible(True)
@@ -358,7 +348,7 @@ def game_loop(window_surface, level_number, player):
         victory_sound.play()
 
         new_skin = False
-        if level_number in SKIN_LEVELS and level_number not in player.skins:
+        if level_number in config.SKIN_LEVELS and level_number not in player.skins:
             new_skin = True
             player.skins.append(level_number)
 
@@ -370,15 +360,15 @@ def game_loop(window_surface, level_number, player):
             handler = open("../stats/high_score.json", 'w')
             json.dump(data, handler)
             handler.close()
-            layouts.victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, False, score, True, new_skin)
+            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, True, new_skin)
         else:
-            layouts.victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, False, score, False, new_skin)
+            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, False, new_skin)
         victory_sound.stop()
         if level_number+1 not in player.levels:
             player.levels.append(int(level_number+1))
     else:
         game_over_sound.play()
-        layouts.defeat_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+        layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         game_over_sound.stop()
 
     pygame.display.update()
@@ -397,7 +387,7 @@ def boss_game_loop(window_surface, level_number, player):
         background_image_in_game = pygame.image.load("../drawable/backgrounds/background" + str(level_number) + ".jpg")
     except Exception:
         background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
-    background_image_in_game = pygame.transform.scale(background_image_in_game, (WINDOW_WIDTH, WINDOW_HEIGHT))
+    background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
 
     # set up music
     game_over_sound = pygame.mixer.Sound('../sound/game_over.wav')
@@ -417,12 +407,12 @@ def boss_game_loop(window_surface, level_number, player):
     font = pygame.font.SysFont(None, 60)
     score_text = interface.TextView(font, colors.WHITE, 10, 0)
     top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
-    timer_text = interface.TextView(font, colors.WHITE, 10 * WINDOW_WIDTH / 12, 10)
+    timer_text = interface.TextView(font, colors.WHITE, 10 * config.WINDOW_WIDTH / 12, 10)
 
     meow_hero = objects.MeowHero(player.current_skin)
-    meow_hero.rect.move_ip(int(WINDOW_WIDTH / 2), 7 * int(WINDOW_HEIGHT / 8))
+    meow_hero.rect.move_ip(int(config.WINDOW_WIDTH / 2), 7 * int(config.WINDOW_HEIGHT / 8))
 
-    health_points = objects.Health(1, WINDOW_WIDTH / 30, WINDOW_HEIGHT / 30)
+    health_points = objects.Health(1, config.WINDOW_WIDTH / 30, config.WINDOW_HEIGHT / 30)
 
     bullets = []
     enemies = []
@@ -451,11 +441,11 @@ def boss_game_loop(window_surface, level_number, player):
         enemies.append(enemy)
     elif level_number == 9:
         enemy = objects.DedMorozBoss(level_number)
-        enemy.rect.move_ip(WINDOW_WIDTH/2, 0)
+        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
         enemies.append(enemy)
     elif level_number == 10:
         enemy = objects.DiplomCommitteeBoss(level_number)
-        enemy.rect.move_ip(WINDOW_WIDTH/2, 0)
+        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
         enemies.append(enemy)
     elif level_number == 12:
         enemy = objects.OlegAlexeevichBoss(level_number)
@@ -514,7 +504,7 @@ def boss_game_loop(window_surface, level_number, player):
                 # spawn bonuses by time
                 if main_timer % 10 == 0:
                     bonus = objects.Bonus("Coin", level_number)
-                    bonus.rect.move_ip(random.randint(0, WINDOW_WIDTH), random.randint(200, WINDOW_HEIGHT))
+                    bonus.rect.move_ip(random.randint(0, config.WINDOW_WIDTH), random.randint(200, config.WINDOW_HEIGHT))
                     bonuses.append(bonus)
 
             if event.type == KEYDOWN:
@@ -537,7 +527,7 @@ def boss_game_loop(window_surface, level_number, player):
 
             if event.type == KEYUP:
                 if event.key == K_ESCAPE:
-                    quit_state = layouts.interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+                    quit_state = layouts.interruption_menu(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
                     if quit_state:
                         print("Goodbye")
                         pygame.mixer.music.stop()
@@ -555,11 +545,11 @@ def boss_game_loop(window_surface, level_number, player):
         # move the player around
         if move_left and meow_hero.rect.left > 0:
             meow_hero.move(-1, 0)
-        if move_right and meow_hero.rect.right < WINDOW_WIDTH:
+        if move_right and meow_hero.rect.right < config.WINDOW_WIDTH:
             meow_hero.move(1, 0)
         if move_up and meow_hero.rect.top > 0:
             meow_hero.move(0, -1)
-        if move_down and meow_hero.rect.bottom < WINDOW_HEIGHT:
+        if move_down and meow_hero.rect.bottom < config.WINDOW_HEIGHT:
             meow_hero.move(0, 1)
 
         # hitting enemy
@@ -651,7 +641,7 @@ def boss_game_loop(window_surface, level_number, player):
             victory = False
 
         pygame.display.update()
-        main_clock.tick(FPS)
+        main_clock.tick(config.FPS)
 
     pygame.mixer.music.stop()
     pygame.mouse.set_visible(True)
@@ -662,7 +652,7 @@ def boss_game_loop(window_surface, level_number, player):
         victory_sound.play()
 
         new_skin = False
-        if level_number in SKIN_LEVELS and level_number not in player.skins:
+        if level_number in config.SKIN_LEVELS and level_number not in player.skins:
             new_skin = True
             player.skins.append(level_number)
 
@@ -674,15 +664,15 @@ def boss_game_loop(window_surface, level_number, player):
             handler = open("../stats/high_score.json", 'w')
             json.dump(data, handler)
             handler.close()
-            layouts.victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, True, score, True, new_skin)
+            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, True, new_skin)
         else:
-            layouts.victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, True, score, False, new_skin)
+            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, False, new_skin)
         victory_sound.stop()
         if level_number+1 not in player.levels:
             player.levels.append(int(level_number+1))
     else:
         game_over_sound.play()
-        layouts.defeat_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
+        layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         game_over_sound.stop()
 
     pygame.display.update()

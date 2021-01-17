@@ -6,8 +6,7 @@ import pygame
 from pygame.locals import *
 from time import sleep
 
-from . import interface
-from . import colors
+from . import interface, colors
 
 """
 Здесь рисую маленькие всплывающие окна
