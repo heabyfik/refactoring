@@ -8,14 +8,7 @@ from time import sleep
 
 from . import interface, colors
 
-"""
-Здесь рисую маленькие всплывающие окна
-Сначала отрисовывается рамка, потом окно, потом кнопки
-И прочее содержимое
-"""
 
-
-# return true if quit
 def interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     pygame.mouse.set_visible(True)
     button_continue = interface.Button(WINDOW_WIDTH / 2 + 100, WINDOW_HEIGHT / 4,
@@ -25,31 +18,42 @@ def interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
 
     while True:
         for event in pygame.event.get():
-            mouse_pos = pygame.mouse.get_pos()
-            if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    pygame.mouse.set_visible(False)
-                    return False
+            exit = _check_exit_event(event, button_continue, button_quit)
+            if exit != None: 
+                return exit
 
-            if button_continue.is_over(mouse_pos):
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    pygame.mouse.set_visible(False)
-                    return False
-
-            if button_quit.is_over(mouse_pos):
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    return True
-
-            pygame.draw.rect(window_surface, colors.BLACK,
-                             (WINDOW_WIDTH / 2 + 100 - 5, WINDOW_HEIGHT / 5 - 5,
-                              WINDOW_WIDTH / 3 + 10, WINDOW_HEIGHT / 2 + 10))
-            pygame.draw.rect(window_surface, colors.BRIGHT_GREY,
-                             (WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/5, WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2))
-
-            button_continue.draw(window_surface)
-            button_quit.draw(window_surface)
-
+            _draw_interruption_menu(window_surface, button_continue, button_quit)
             pygame.display.update()
+
+
+def _draw_interruption_menu(window_surface, button_continue, button_quit):
+    pygame.draw.rect(window_surface, colors.BLACK,
+                     (WINDOW_WIDTH / 2 + 100 - 5, WINDOW_HEIGHT / 5 - 5,
+                      WINDOW_WIDTH / 3 + 10, WINDOW_HEIGHT / 2 + 10))
+    pygame.draw.rect(window_surface, colors.BRIGHT_GREY,
+                     (WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/5, WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2))
+
+    button_continue.draw(window_surface)
+    button_quit.draw(window_surface)
+
+
+def _check_exit_event(event, button_continue, button_quit):
+    QUIT = True
+    mouse_pos = pygame.mouse.get_pos()
+
+    if event.type == KEYUP:
+        if event.key == K_ESCAPE:
+            pygame.mouse.set_visible(False)
+            return not QUIT
+
+    if button_continue.is_over(mouse_pos):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pygame.mouse.set_visible(False)
+            return not QUIT
+
+    if button_quit.is_over(mouse_pos):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            return QUIT
 
 
 def stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
@@ -88,12 +92,10 @@ def stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
             elem.draw(window_surface)
 
         button_close.draw(window_surface)
-
         pygame.display.update()
 
 
 def victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, boss, score, new_record, new_skin):
-
     rect = pygame.Rect((0, 0), (2*WINDOW_WIDTH/3, 2*WINDOW_HEIGHT/3))
     rect_border = pygame.Rect((0, 0), (2*WINDOW_WIDTH/3+10, 2*WINDOW_HEIGHT/3+10))
     rect.center = (WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
@@ -126,27 +128,29 @@ def victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, boss, score, new
 
     if new_record:
         sleep(0.5)
-        new_top_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
-        new_top_sound.play()
-        text_formula.color = colors.RED
-        text_formula.next_line(100)
-        text_formula.draw_this(window_surface, "New level record!")
+        _handle_new_record()
 
     if new_skin:
         sleep(0.5)
-        text_formula.color = colors.BLUE
-        text_formula.next_line(100)
-        text_formula.draw_this(window_surface, "New skin available!")
+        _handle_new_skin()
 
     text_press_esc.draw(window_surface)
-
     pygame.display.update()
+    _await_esc_click()
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    return
+
+def _handle_new_record(text_formula):
+    new_top_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
+    new_top_sound.play()
+    text_formula.color = colors.RED
+    text_formula.next_line(100)
+    text_formula.draw_this(window_surface, "New level record!")
+
+
+def _handle_new_skin(text_formula):
+    text_formula.color = colors.BLUE
+    text_formula.next_line(100)
+    text_formula.draw_this(window_surface, "New skin available!")
 
 
 def defeat_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
@@ -160,15 +164,9 @@ def defeat_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     text_view_press_esc.draw(window_surface)
 
     pygame.display.update()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    return
+    _await_esc_click()
 
 
-# returning player
 def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
     player.save_current_state()
     clock = pygame.time.Clock()
@@ -193,40 +191,21 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
     while not done:
         for event in pygame.event.get():
             mouse_pos = pygame.mouse.get_pos()
+            name = input_box.text.strip()
 
             if event.type == pygame.QUIT:
                 done = True
 
             if button_done.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    name = input_box.text.strip()
-                    if not name:
-                        done = True
-                        continue
-                    path = '../stats/players/' + name + '.json'
-                    if os.path.isfile(path):
-                        player = interface.load_player_by_path(path)
-                    else:
-                        interface.create_empty_profile(name)
-                        player = interface.load_player_by_path(path)
-                    input_box.text = ''
+                    player = _load_player_by_name()
                     done = True
 
             if event.type == KEYUP:
                 if event.key == K_ESCAPE:
                     done = True
                 elif event.key == pygame.K_RETURN:  # if enter
-                    name = input_box.text.strip()
-                    if not name:
-                        done = True
-                        continue
-                    path = '../stats/players/' + name + '.json'
-                    if os.path.isfile(path):
-                        player = interface.load_player_by_path(path)
-                    else:
-                        interface.create_empty_profile(name)
-                        player = interface.load_player_by_path(path)
-                    input_box.text = ''
+                    player = _load_player_by_name(name)
                     done = True
 
             input_box.handle_event(event)
@@ -247,7 +226,20 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
     return player
 
 
-# returning player
+def _load_player_by_name(name):
+    if not name:
+        return
+        
+    path = '../stats/players/' + name + '.json'
+    if os.path.isfile(path):
+        player = interface.load_player_by_path(path)
+    else:
+        interface.create_empty_profile(name)
+        player = interface.load_player_by_path(path)
+
+    return player
+
+
 def change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
     rect = pygame.Rect((0, 0), (2 * WINDOW_WIDTH / 3, 2 * WINDOW_HEIGHT / 3))
     rect_border = pygame.Rect((0, 0), (2 * WINDOW_WIDTH / 3 + 10, 2 * WINDOW_HEIGHT / 3 + 10))
@@ -277,7 +269,7 @@ def change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
         buttons.append(button)
 
     while True:
-        mouse_pos = pygame.mouse.get_pos()  # gets mouse position
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == KEYUP:
                 if event.key == K_ESCAPE:
@@ -319,23 +311,15 @@ def future_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     text_future = interface.TextView(font1, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6)
     text_future.rect.center = (WINDOW_WIDTH / 5, WINDOW_HEIGHT / 3)
 
-    text_future.next_line(82)
-    text_future.draw_this(window_surface, "Vladislav Cepelev (teamlead)")
-    text_future.next_line(82)
-    text_future.draw_this(window_surface, "Alexander Zorkin (programmer)")
-    text_future.next_line(82)
-    text_future.draw_this(window_surface, "Rufina Rafikova (programmer/storywriter)")
-    text_future.next_line(82)
-    text_future.draw_this(window_surface, "Anastasia Politova (game designer)")
+    for text in ["Vladislav Cepelev (teamlead)", 
+                 "Alexander Zorkin (programmer)",
+                 "Rufina Rafikova (programmer/storywriter)", 
+                 "Anastasia Politova (game designer)"]:
+        text_future.next_line(82)
+        text_future.draw_this(window_surface, text)
 
     pygame.display.update()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == KEYUP:
-                return
-            if event.type == MOUSEBUTTONDOWN:
-                return
+    _await_mouse_click()
 
 
 def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, score, time):
@@ -396,12 +380,7 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
     text_press_esc.draw(window_surface)
 
     pygame.display.update()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    return
+    _await_esc_click()
 
 
 def giving_port_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
@@ -441,3 +420,16 @@ def giving_port_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
 
             button_done.draw(window_surface)
             pygame.display.update()
+
+
+def _await_esc_click():
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYUP && event.key == K_ESCAPE:
+                return
+
+def _await_mouse_click():
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYUP || event.type == MOUSEBUTTONDOWN:
+                return
