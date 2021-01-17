@@ -4,10 +4,6 @@ import pygame
 
 from . import config
 
-"""
-Основные объекты, появляющиеся в игре
-"""
-
 
 def random_image_loader(path, max_num):
     number = random.randint(1, max_num)
@@ -15,11 +11,9 @@ def random_image_loader(path, max_num):
 
 
 class MeowHero(pygame.sprite.Sprite):
-    # This class represents a Cat Hero. It derives from the "Sprite" class in PyGame.
     def __init__(self, skin_type):
         super().__init__()
 
-        # getting rect
         self.w = int(config.WINDOW_WIDTH / 15)
         self.h = int(config.WINDOW_HEIGHT / 8)
 
@@ -28,7 +22,6 @@ class MeowHero(pygame.sprite.Sprite):
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
-        # getting attributes
         self.life = 9
         self.weapon_power = 1
         self.move_rate = 8
@@ -40,7 +33,6 @@ class MeowHero(pygame.sprite.Sprite):
         self.current_reload = 0
         self.rate_of_fire_time_limit = 0
 
-        # shield image
         image = pygame.image.load('../drawable/sprites/cat_hero/meow_shield.png')
         self.image_shield = pygame.transform.scale(image, (self.w, self.h))
         self.shield_rect = self.image_shield.get_rect()
@@ -123,8 +115,8 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, level):
         super().__init__()
 
-        self.w = int(config.WINDOW_WIDTH / 14)  # by default
-        self.h = int(config.WINDOW_HEIGHT / 14)  # by default
+        self.w = int(config.WINDOW_WIDTH / 14) 
+        self.h = int(config.WINDOW_HEIGHT / 14) 
 
         self.level = level
 
@@ -133,8 +125,7 @@ class Enemy(pygame.sprite.Sprite):
         self.reload = 0
         self.reload_time = 14 - level
 
-        image = pygame.image.load('../drawable/sprites/enemy/enemy_3.png')  # by default
-
+        image = pygame.image.load('../drawable/sprites/enemy/enemy_3.png')
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -168,11 +159,9 @@ class ChildrenEnemy(CommonEnemy):
 
         self.speed = random.randint(2, 7)
         self.direction = random.randint(-4, 4)
-
         self.life = 4
 
         image = random_image_loader('../drawable/sprites/enemy/children/children', 6)
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -194,11 +183,9 @@ class DogEnemy(CommonEnemy):
 
         self.speed = random.randint(1, 4)
         self.direction = random.randint(-2, 2)
-
         self.life = random.randint(5, 10)
 
         image = random_image_loader('../drawable/sprites/enemy/dog_enemy/dog_enemy', 12)
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -207,7 +194,6 @@ class DogEnemy(CommonEnemy):
     def attack(self, *args):
         pass
 
-    # TODO: change it pls
     def move(self):
         self.rect.move_ip(self.direction, self.speed)
 
@@ -223,14 +209,11 @@ class DancingCatEnemy(CommonEnemy):
         self.direction = random.randint(-3, 3)
 
         self.change_direction_time = random.randint(10, 70)
-
         self.reload_time = 1000
         self.reload = self.reload_time
-
         self.life = random.randint(4, 7)
 
         image = random_image_loader('../drawable/sprites/enemy/dancing_cats/dancing_cat', 4)
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -262,7 +245,6 @@ class CatBossEnemy(CommonEnemy):
         self.h = int(config.WINDOW_HEIGHT / 6)
 
         image = random_image_loader('../drawable/sprites/enemy/cat_boss/cat_boss', 8)
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -270,7 +252,6 @@ class CatBossEnemy(CommonEnemy):
 
         self.reload_time = 35
         self.reload = random.randint(0, 26)
-
         self.life = 24
 
     def move(self):
@@ -313,19 +294,15 @@ class Boss(Enemy):
     def __init__(self, level):
         super().__init__(level)
 
-        # bosses are bigger
         self.w = int(config.WINDOW_WIDTH / 5)
         self.h = int(config.WINDOW_HEIGHT / 6)
 
-        # and stronger
-        self.life *= 25
-
-        # movement
         self.move_right = True
         self.move_left = False
         self.speed = 3
         self.move_time = 120
 
+        self.life *= 25
         self.reload_time = 1
 
     def move(self):
@@ -365,7 +342,6 @@ class AngryManBoss(Boss):
         super().__init__(level)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/zloy_muzhic.png')
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -389,7 +365,6 @@ class ExamBoss(Boss):
         self.h = int(config.WINDOW_HEIGHT / 5)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/ege.png')
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
@@ -398,7 +373,6 @@ class ExamBoss(Boss):
 
         self.reload_time = 2
 
-    # TODO: change this
     def attack(self, pos):
         self.speed = random.randint(2, 7)
         if self.reload == self.reload_time:
@@ -418,11 +392,9 @@ class CommitteeBoss(Boss):
         self.h = int(config.WINDOW_HEIGHT / 5)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/komissia3.png')
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
-    # TODO: change this
     def attack(self, pos):
         if self.reload == self.reload_time:
             coin = random.randint(1, 3)
@@ -447,7 +419,6 @@ class DedMorozBoss(Boss):
         self.h = int(config.WINDOW_HEIGHT / 5)
 
         self.speed = 2
-
         self.image = pygame.image.load('../drawable/sprites/enemy/bosses/ded_moroz/ded_moroz4.png')
         self.cur_num = 4
 
@@ -457,7 +428,6 @@ class DedMorozBoss(Boss):
         self.damage_life = self.life / self.cur_num
         self.life -= 1
 
-    # TODO: change this
     def attack(self, pos):
         if self.reload == self.reload_time:
             bullet = EnemyBullet(self.level, "Boss InHero", pos, self.rect.center)
@@ -468,7 +438,6 @@ class DedMorozBoss(Boss):
             self.reload += 1
 
     def draw(self, window):
-        # draw damaged boss
         num = int(self.life / self.damage_life) + 1
 
         if num != self.cur_num:
@@ -507,7 +476,6 @@ class EjudjeBoss(Boss):
             self.reload += 1
 
     def draw(self, window):
-        # draw damaged boss
         num = int(self.life / self.damage_life) + 1
 
         if num != self.cur_num:
@@ -622,7 +590,6 @@ class OlegAlexeevichBoss(Boss):
         self.h = int(config.WINDOW_HEIGHT / 5)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/teachers/teachers6.png')
-
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
 
