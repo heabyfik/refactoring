@@ -36,6 +36,34 @@ def wait_for_player_to_press_key(player):
 def story_loop(window_surface, level_number, prefix, player):
     pygame.mouse.set_visible(False)
 
+    pygame.mixer.music.load('../sound/short_tracks/typewriter.mp3')
+    pygame.mixer.music.play(-1)
+
+    text = _get_typewriter_text(player)
+    
+    if text:
+        font = pygame.font.SysFont(None, 60)
+        text_view = interface.TextView(font, colors.WHITE, config.WINDOW_WIDTH/6+50, config.WINDOW_HEIGHT/10)
+
+        window_surface.fill(colors.BLACK)
+
+        image = pygame.image.load('../drawable/sprites/cat_hero/skins/cat' + str(player.current_skin) + '.png')
+        image_surface = pygame.transform.scale(image, (300, 700))
+        rect = image_surface.get_rect()
+
+        rect.move_ip(0, 150)
+        window_surface.blit(image_surface, rect)
+
+        pygame.display.update()
+        __skip_buffered_events()
+        _draw_typewriter_text(text_view, text)
+
+        pygame.mixer.music.stop()
+        wait_for_player_to_press_key(player)
+        pygame.mouse.set_visible(True)
+
+
+def _get_typewriter_text(player):
     try:
         handler = open("../plot/eng/" + prefix + "_story_" + str(level_number) + ".txt", 'r', errors='ignore')
     except FileNotFoundError:
@@ -43,33 +71,17 @@ def story_loop(window_surface, level_number, prefix, player):
         pygame.mouse.set_visible(True)
         return
 
-    pygame.mixer.music.load('../sound/short_tracks/typewriter.mp3')
-    pygame.mixer.music.play(-1)
-
     text = handler.read()
     text = text.split('\n')
     handler.close()
 
-    font = pygame.font.SysFont(None, 60)
-    text_view = interface.TextView(font, colors.WHITE, config.WINDOW_WIDTH/6+50, config.WINDOW_HEIGHT/10)
+    return text
 
-    window_surface.fill(colors.BLACK)
 
-    image = pygame.image.load('../drawable/sprites/cat_hero/skins/cat' + str(player.current_skin) + '.png')
-    image_surface = pygame.transform.scale(image, (300, 700))
-    rect = image_surface.get_rect()
-
-    rect.move_ip(0, 150)
-    window_surface.blit(image_surface, rect)
-
-    pygame.display.update()
-
-    # try to skip buffered events
-    for event in pygame.event.get():
-        continue
-
+def _draw_typewriter_text(text_view, text):
     buf = ""
     skip = False
+
     for line in text:
         line = line.replace("(username)", player.name)
         for elem in line:
@@ -77,20 +89,18 @@ def story_loop(window_surface, level_number, prefix, player):
                 text_view.draw_this(window_surface, line)
                 pygame.display.update()
                 break
+
             buf += elem
             text_view.draw_this(window_surface, buf)
             pygame.display.update()
             sleep(0.05)
-            # skip if escape
+
             for event in pygame.event.get():
                 if event.type == KEYUP:
                     skip = True
+
         buf = ""
         text_view.next_line(60)
-
-    pygame.mixer.music.stop()
-    wait_for_player_to_press_key(player)
-    pygame.mouse.set_visible(True)
 
 
 def enemy_switch_by_level(level_number):
@@ -656,6 +666,11 @@ def _init_healthbar():
         return healthbar
 
 
-def init_meow_hero(player):
+def _init_meow_hero(player):
     meow_hero = objects.MeowHero(player.current_skin)
     meow_hero.rect.move_ip(int(config.WINDOW_WIDTH/2), 7*int(config.WINDOW_HEIGHT/8))
+
+
+def __skip_buffered_events():
+    for event in pygame.event.get():
+        pass
