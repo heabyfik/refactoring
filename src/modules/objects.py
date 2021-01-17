@@ -157,7 +157,7 @@ class CommonEnemy(Enemy):
         super().__init__(name, level)
 
 
-class Children(CommonEnemy):
+class ChildrenEnemy(CommonEnemy):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -183,7 +183,7 @@ class Children(CommonEnemy):
         self.rect.move_ip(self.direction, self.speed)
 
 
-class Dog(CommonEnemy):
+class DogEnemy(CommonEnemy):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -210,7 +210,7 @@ class Dog(CommonEnemy):
         self.rect.move_ip(self.direction, self.speed)
 
 
-class DancingCat(CommonEnemy):
+class DancingCatEnemy(CommonEnemy):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -352,7 +352,7 @@ class Boss(Enemy):
                     self.move_left = True
 
 
-class ZloyMuzhic(Boss):
+class AngryManBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -373,7 +373,7 @@ class ZloyMuzhic(Boss):
             self.reload += 1
 
 
-class EGE(Boss):
+class ExamBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -403,7 +403,7 @@ class EGE(Boss):
             self.reload += 1
 
 
-class Committee(Boss):
+class CommitteeBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -432,7 +432,7 @@ class Committee(Boss):
             self.reload += 1
 
 
-class DedMoroz(Boss):
+class DedMorozBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -474,7 +474,7 @@ class DedMoroz(Boss):
         window.blit(self.image_surface, self.rect)
 
 
-class Ejudje(Boss):
+class EjudjeBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -512,7 +512,7 @@ class Ejudje(Boss):
         window.blit(self.image_surface, self.rect)
 
 
-class Teacher(Boss):
+class TeacherBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 
@@ -597,7 +597,7 @@ class Teacher(Boss):
                     self.move_down = True
 
 
-class OlegAlexeevich(Boss):
+class OlegAlexeevichBoss(Boss):
     def __init__(self, name, level):
         super().__init__(name, level)
 

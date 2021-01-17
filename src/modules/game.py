@@ -110,11 +110,11 @@ def story_loop(window_surface, level_number, prefix, player):
 def enemy_switch_by_level(level_number):
     # set up enemies
     if level_number == 2:
-        return objects.Children("Children", level_number)
+        return objects.ChildrenEnemy("Children", level_number)
     elif level_number == 3:
-        return objects.Dog("Dog", level_number)
+        return objects.DogEnemy("Dog", level_number)
     elif level_number == 8:
-        return objects.DancingCat("Dancing cat", level_number)
+        return objects.DancingCatEnemy("Dancing cat", level_number)
     elif level_number == 11:
         return objects.CatBossEnemy("Cat Boss", level_number)
 
@@ -437,32 +437,32 @@ def boss_game_loop(window_surface, level_number, player):
 
     # set up bosses
     if level_number == 1:
-        enemy = objects.ZloyMuzhic("Zloy muzhic", level_number)
+        enemy = objects.AngryManBoss("Angry Man", level_number)
         enemies.append(enemy)
     elif level_number == 4:
-        enemy = objects.EGE("EGE", level_number)
+        enemy = objects.ExamBoss("Exam", level_number)
         enemies.append(enemy)
     elif level_number == 5:
-        enemy = objects.Committee("Committee", level_number)
+        enemy = objects.CommitteeBoss("Committee", level_number)
         enemies.append(enemy)
     elif level_number == 6:
         for i in range(4):
-            enemy = objects.Teacher(str(i+1), level_number)
+            enemy = objects.TeacherBoss(str(i+1), level_number)
             enemy.rect.move_ip(i*300, 0)
             enemies.append(enemy)
     elif level_number == 7:
-        enemy = objects.Ejudje("Ejudje", level_number)
+        enemy = objects.EjudjeBoss("Ejudje", level_number)
         enemies.append(enemy)
     elif level_number == 9:
-        enemy = objects.DedMoroz("Ded Moroz", level_number)
+        enemy = objects.DedMorozBoss("Ded Moroz", level_number)
         enemy.rect.move_ip(WINDOW_WIDTH/2, 0)
         enemies.append(enemy)
     elif level_number == 10:
-        enemy = objects.DiplomCommittee("Diplom Committee", level_number)
+        enemy = objects.DiplomCommitteeBoss("Diplom Committee", level_number)
         enemy.rect.move_ip(WINDOW_WIDTH/2, 0)
         enemies.append(enemy)
     elif level_number == 12:
-        enemy = objects.OlegAlexeevich("Oleg Alexeevich", level_number)
+        enemy = objects.OlegAlexeevichBoss("Oleg Alexeevich", level_number)
         enemies.append(enemy)
 
     # define healthbar
