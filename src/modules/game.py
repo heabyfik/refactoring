@@ -40,7 +40,7 @@ def story_loop(window_surface, level_number, prefix, player):
     pygame.mixer.music.play(-1)
 
     text = _get_typewriter_text(player)
-    
+
     if text:
         font = pygame.font.SysFont(None, 60)
         text_view = interface.TextView(font, colors.WHITE, config.WINDOW_WIDTH/6+50, config.WINDOW_HEIGHT/10)
@@ -122,6 +122,9 @@ score_text = interface.TextView(font, colors.WHITE, 10, 0)
 top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
 timer_text = interface.TextView(font, colors.WHITE, 10*config.WINDOW_WIDTH/12, 10)
 
+enemy_spawn_proba = {2:1, 3:0.9, 8:0.42, 11:0.20}
+spawn_proba = enemy_spawn_proba[int(level_number)]
+
 main_timer = 0
 score = 0
 top_score = 0
@@ -136,6 +139,9 @@ move_left = move_right = move_up = move_down = False
 meow_hero = None
 health_points = objects.Health(1, config.WINDOW_WIDTH/30, config.WINDOW_HEIGHT/30)
 
+running = True
+victory = True
+
 
 def game_loop(window_surface, level_number, player):
     pygame.mouse.set_visible(False)
@@ -146,184 +152,42 @@ def game_loop(window_surface, level_number, player):
     _preload_top_score(level_number)
     _init_meow_hero(player)
 
-    enemy_spawn_proba = {2:1, 3:0.9, 8:0.42, 11:0.20}
-    spawn_proba = enemy_spawn_proba[int(level_number)]
-
     global main_timer
-    main_timer = 10*level_number + 60
 
+    main_timer = 10*level_number + 60
     pygame.mixer.music.play(-1, 0.0)
 
-    running = True
-    victory = True
-    while running:  # the game loop runs while the game part is playing
-        score += 1  # increase score
-        # event handling
+    while running: 
+        score += 1 
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate(player)
 
             if event.type == pygame.USEREVENT:
-                main_timer -= 1
-                # victory condition
-                if main_timer <= 0:
-                    running = False
+                _decrease_timer()
+                _decrement_invulnerability()
 
-                # decrement invulnerability
-                if meow_hero.invulnerability > 0:
-                    meow_hero.invulnerability -= 1
-
-                # spawn enemy
-                dice = random.random()
-                if dice < spawn_proba:
-                    enemy = enemy_switch_by_level(level_number)
-                    enemies.append(enemy)
-
-                # attack time
-                for enemy in enemies:
-                    enemy_bullet = enemy.attack(meow_hero.rect.center)
-                    if enemy_bullet is not None:
-                        enemy_bullets.append(enemy_bullet)
-
-                # bonus lifetime
-                for bonus in bonuses:
-                    bonus.lifetime -= 1
-                    if bonus.lifetime <= 0:
-                        bonuses.remove(bonus)
-
-                # spawn bonuses by time
-                if main_timer % 10 == 0:
-                    bonus = objects.Bonus("Coin", level_number)
-                    bonus.rect.move_ip(random.randint(0, config.WINDOW_WIDTH), random.randint(200, config.WINDOW_HEIGHT))
-                    bonuses.append(bonus)
+                _spawn_enemy(level_number)
+                _perform_enemies_attack()
+                _decrement_bonuses_lifetime()
+                _spawn_new_bonuses()
 
             if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    bullet = objects.Bullet(level_number)
-                    bullet.rect.move_ip(meow_hero.rect.left, meow_hero.rect.top)
-                    bullets.append(bullet)
-                if event.key == K_LEFT or event.key == ord('a'):
-                    move_right = False
-                    move_left = True
-                if event.key == K_RIGHT or event.key == ord('d'):
-                    move_left = False
-                    move_right = True
-                if event.key == K_UP or event.key == ord('w'):
-                    move_down = False
-                    move_up = True
-                if event.key == K_DOWN or event.key == ord('s'):
-                    move_up = False
-                    move_down = True
+                _handle_keydown(event)
 
             if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    quit_state = layouts.interruption_menu(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-                    if quit_state:
-                        print("Goodbye")
-                        pygame.mixer.music.stop()
-                        pygame.mouse.set_visible(True)
-                        return False
+                _handle_keyup(event)
 
-                if event.key == K_LEFT or event.key == ord('a'):
-                    move_left = False
-                if event.key == K_RIGHT or event.key == ord('d'):
-                    move_right = False
-                if event.key == K_UP or event.key == ord('w'):
-                    move_up = False
-                if event.key == K_DOWN or event.key == ord('s'):
-                    move_down = False
+        _move_player_around()
 
-        # move the player around
-        if move_left and meow_hero.rect.left > 0:
-            meow_hero.move(-1, 0)
-        if move_right and meow_hero.rect.right < config.WINDOW_WIDTH:
-            meow_hero.move(1, 0)
-        if move_up and meow_hero.rect.top > 0:
-            meow_hero.move(0, -1)
-        if move_down and meow_hero.rect.bottom < config.WINDOW_HEIGHT:
-            meow_hero.move(0, 1)
+        _hit_enemy_by_bullet()
+        _hit_hero_by_enemy()
+        _hit_hero_by_bullet()
 
-        # hitting enemy
-        for enemy in enemies:
-            for bullet in bullets:
-                if enemy.rect.colliderect(bullet.rect):
-                    enemy.life -= bullet.power
-                    bullet.life -= 1
-                    music.attack_sound.play()
-
-        # hitting hero:
-        for enemy in enemies:
-            if meow_hero.rect.colliderect(enemy.rect) and not meow_hero.invulnerability:
-                meow_hero.life -= 1
-                meow_hero.invulnerability += 1
-                enemies.remove(enemy)
-                music.damage_sound.play()
-
-        # hitting hero by bullets
-        for bullet in enemy_bullets:
-            if meow_hero.rect.colliderect(bullet.rect) and not meow_hero.invulnerability:
-                meow_hero.life -= 1
-                enemy_bullets.remove(bullet)
-                meow_hero.invulnerability += 1
-                music.damage_sound.play()
-
-        # collecting bonuses:
-        for bonus in bonuses:
-            if meow_hero.rect.colliderect(bonus.rect):
-                if bonus.bonus_type == "Coin":
-                    score += 1000
-                    music.coin_sound.play()
-                bonuses.remove(bonus)
-
-        # check if bullet is out of screen
-        for bullet in bullets:
-            if bullet.rect.bottom <= 0:
-                bullets.remove(bullet)
-
-        # draw background
-        window_surface.blit(background_image_in_game, [0, 0])
-
-        # draw health points
-        health_points.draw(window_surface, meow_hero.life)
-
-        # draw text
-        score_text.draw_this(window_surface, 'Score: %s' % (score), )
-        top_score_text.draw_this(window_surface, 'Top Score: %s' % (top_score))
-        timer_text.draw_this(window_surface, "Time " + str(main_timer).rjust(3) if main_timer > 0 else 'GG')
-
-        # draw hero
-        meow_hero.draw(window_surface)
-
-        # draw bonuses
-        for bonus in bonuses:
-            bonus.draw(window_surface)
-
-        # draw enemies
-        for enemy in enemies:
-            enemy.move()
-            if enemy.rect.top > WINDOW_HEIGHT or enemy.rect.right < 0 or enemy.rect.left > config.WINDOW_WIDTH or enemy.life <= 0:
-                enemies.remove(enemy)
-                score += 100 * enemy.level
-            enemy.draw(window_surface)
-
-        # move and draw hero bullets
-        for bullet in bullets:
-            bullet.move()
-            if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
-                bullets.remove(bullet)
-            bullet.draw(window_surface)
-
-        # move and draw enemy bullets
-        for bullet in enemy_bullets:
-            bullet.move()
-            if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
-                enemy_bullets.remove(bullet)
-            bullet.draw(window_surface)
-
-        # check for ending:
-        if meow_hero.life <= 0:
-            running = False
-            victory = False
+        _collect_bonuses()
+        _check_bullets_out_of_screen()
+        _move_and_draw_objects(window_surface)
 
         pygame.display.update()
         main_clock.tick(config.FPS)
@@ -332,33 +196,12 @@ def game_loop(window_surface, level_number, player):
     pygame.mouse.set_visible(True)
 
     if victory:
-        score = score + meow_hero.life*1000
-        # checking for new record
-        music.victory_sound.play()
+        global score
 
-        new_skin = False
-        if level_number in config.SKIN_LEVELS and level_number not in player.skins:
-            new_skin = True
-            player.skins.append(level_number)
-
-        if score > top_score:
-            handler = open(config.HIGHT_SCORE_JSON, 'r')
-            data = json.load(handler)
-            handler.close()
-            data[str(level_number)] = [player.name, score]
-            handler = open(config.HIGHT_SCORE_JSON, 'w')
-            json.dump(data, handler)
-            handler.close()
-            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, True, new_skin)
-        else:
-            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, False, new_skin)
-        music.victory_sound.stop()
-        if level_number+1 not in player.levels:
-            player.levels.append(int(level_number+1))
+        score = score + meow_hero.life * 1000
+        _handle_victory(player, level_number, window_surface)
     else:
-        music.game_over_sound.play()
-        layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        music.game_over_sound.stop()
+        _handle_defeat(window_surface)
 
     pygame.display.update()
 
@@ -378,179 +221,39 @@ def boss_game_loop(window_surface, level_number, player):
     health_bar = _init_healthbar()
     pygame.mixer.music.play(-1, 0.0)
 
-    running = True
-    victory = True
-    while running:  # the game loop runs while the game part is playing
-        score += 1  # increase score
+    while running:
+        score += 1 
 
-        # event handling
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate(player)
 
             if event.type == pygame.USEREVENT:
                 main_timer += 1
-                # victory condition
-                if len(enemies) == 0:
-                    running = False
-                    victory = True
-                    break
 
-                # decrement invulnerability
-                if meow_hero.invulnerability > 0:
-                    meow_hero.invulnerability -= 1
+                _check_victory()
+                _decrement_invulnerability()
 
-                # attack time
-                for enemy in enemies:
-                    enemy_bullet = enemy.attack(meow_hero.rect.center)
-                    if enemy_bullet is not None:
-                        enemy_bullets.append(enemy_bullet)
-
-                # bonus lifetime
-                for bonus in bonuses:
-                    bonus.lifetime -= 1
-                    if bonus.lifetime <= 0:
-                        bonuses.remove(bonus)
-
-                # spawn bonuses by time
-                if main_timer % 10 == 0:
-                    bonus = objects.Bonus("Coin", level_number)
-                    bonus.rect.move_ip(random.randint(0, config.WINDOW_WIDTH), random.randint(200, config.WINDOW_HEIGHT))
-                    bonuses.append(bonus)
+                _perform_enemies_attack()
+                _decrement_bonuses_lifetime()
+                _spawn_new_bonuses()
 
             if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    bullet = objects.Bullet(level_number)
-                    bullet.rect.move_ip(meow_hero.rect.left, meow_hero.rect.top)
-                    bullets.append(bullet)
-                if event.key == K_LEFT or event.key == ord('a'):
-                    move_right = False
-                    move_left = True
-                if event.key == K_RIGHT or event.key == ord('d'):
-                    move_left = False
-                    move_right = True
-                if event.key == K_UP or event.key == ord('w'):
-                    move_down = False
-                    move_up = True
-                if event.key == K_DOWN or event.key == ord('s'):
-                    move_up = False
-                    move_down = True
+                _handle_keydown(event)
 
             if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    quit_state = layouts.interruption_menu(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-                    if quit_state:
-                        print("Goodbye")
-                        pygame.mixer.music.stop()
-                        pygame.mouse.set_visible(True)
-                        return False
+                _handle_keyup(event)
 
-                if event.key == K_LEFT or event.key == ord('a'):
-                    move_left = False
-                if event.key == K_RIGHT or event.key == ord('d'):
-                    move_right = False
-                if event.key == K_UP or event.key == ord('w'):
-                    move_up = False
-                if event.key == K_DOWN or event.key == ord('s'):
-                    move_down = False
+        _move_player_around()
 
-        # move the player around
-        if move_left and meow_hero.rect.left > 0:
-            meow_hero.move(-1, 0)
-        if move_right and meow_hero.rect.right < config.WINDOW_WIDTH:
-            meow_hero.move(1, 0)
-        if move_up and meow_hero.rect.top > 0:
-            meow_hero.move(0, -1)
-        if move_down and meow_hero.rect.bottom < config.WINDOW_HEIGHT:
-            meow_hero.move(0, 1)
+        _hit_enemy_by_bullet()
+        _hit_hero_by_enemy()
+        _hit_hero_by_bullet()
 
-        # hitting enemy
-        for enemy in enemies:
-            for bullet in bullets:
-                if enemy.rect.colliderect(bullet.rect):
-                    enemy.life -= bullet.power
-                    bullet.life -= 1
-                    music.attack_sound.play()
-
-        # hitting hero:
-        for enemy in enemies:
-            if meow_hero.rect.colliderect(enemy.rect) and not meow_hero.invulnerability:
-                meow_hero.life -= 1
-                meow_hero.invulnerability += 1
-                music.damage_sound.play()
-
-        # hitting hero by bullets
-        for bullet in enemy_bullets:
-            if meow_hero.rect.colliderect(bullet.rect) and not meow_hero.invulnerability:
-                meow_hero.life -= 1
-                enemy_bullets.remove(bullet)
-                meow_hero.invulnerability += 1
-                music.damage_sound.play()
-
-        # collecting bonuses:
-        for bonus in bonuses:
-            if meow_hero.rect.colliderect(bonus.rect):
-                if bonus.bonus_type == "Coin":
-                    score += 1000
-                    music.coin_sound.play()
-                bonuses.remove(bonus)
-
-        # check if bullet is out of screen
-        for bullet in bullets:
-            if bullet.rect.bottom <= 0:
-                bullets.remove(bullet)
-
-        # draw background
-        window_surface.blit(background_image_in_game, [0, 0])
-
-        # draw health points
-        health_points.draw(window_surface, meow_hero.life)
-
-        # draw text
-        score_text.draw_this(window_surface, 'Score: %s' % (score), )
-        top_score_text.draw_this(window_surface, 'Top Score: %s' % (top_score))
-        timer_text.draw_this(window_surface, "Time " + str(main_timer).rjust(3) if main_timer > 0 else 'GG')
-
-        # draw hero
-        meow_hero.draw(window_surface)
-
-        # draw bonuses
-        for bonus in bonuses:
-            bonus.draw(window_surface)
-
-        # draw enemies
-        for enemy in enemies:
-            enemy.move()
-            if enemy.rect.top > config.WINDOW_HEIGHT or enemy.life <= 0:
-                enemies.remove(enemy)
-                score += 100 * enemy.level
-            enemy.draw(window_surface)
-
-        # draw healthbar
-        if health_bar is not None:
-            if len(enemies):
-                health_bar.rect.topleft = enemies[0].rect.center
-                health_bar.rect.move_ip(20, 80)
-                health_bar.draw_this(window_surface, str(enemies[0].life) + '/' + str(boss_life))
-
-        # move and draw hero bullets
-        for bullet in bullets:
-            bullet.move()
-            if bullet.rect.top > config.WINDOW_HEIGHT or bullet.life <= 0:
-                bullets.remove(bullet)
-            bullet.draw(window_surface)
-
-        # move and draw enemy bullets
-        for bullet in enemy_bullets:
-            bullet.move()
-            if bullet.rect.top > config.WINDOW_HEIGHT or bullet.life <= 0:
-                enemy_bullets.remove(bullet)
-            bullet.draw(window_surface)
-
-        # check for ending:
-        if meow_hero.life <= 0:
-            running = False
-            victory = False
+        _collect_bonuses()
+        _check_bullets_out_of_screen()
+        _move_and_draw_objects(window_surface)
+        _redraw_healthbar(health_bar)
 
         pygame.display.update()
         main_clock.tick(config.FPS)
@@ -559,33 +262,12 @@ def boss_game_loop(window_surface, level_number, player):
     pygame.mouse.set_visible(True)
 
     if victory:
-        # checking for new record
+        global score 
+
         score = int((score + meow_hero.life*1000)*100/main_timer)
-        music.victory_sound.play()
-
-        new_skin = False
-        if level_number in config.SKIN_LEVELS and level_number not in player.skins:
-            new_skin = True
-            player.skins.append(level_number)
-
-        if score > top_score:
-            handler = open(config.HIGHT_SCORE_JSON, 'r')
-            data = json.load(handler)
-            handler.close()
-            data[str(level_number)] = [player.name, score]
-            handler = open(config.HIGHT_SCORE_JSON, 'w')
-            json.dump(data, handler)
-            handler.close()
-            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, True, new_skin)
-        else:
-            layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, False, new_skin)
-        music.victory_sound.stop()
-        if level_number + 1 not in player.levels:
-            player.levels.append(int(level_number + 1))
+        _handle_victory(player, level_number, window_surface)
     else:
-        music. game_over_sound.play()
-        layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        music.game_over_sound.stop()
+        _handle_defeat(window_surface)
 
     pygame.display.update()
 
@@ -626,8 +308,6 @@ def _preload_top_score(level_number):
 
 
 def _set_bosses(level_number):
-    global enemies
-
     if level_number == 1:
         enemy = objects.AngryManBoss(level_number)
         enemies.append(enemy)
@@ -667,9 +347,231 @@ def _init_healthbar():
 
 
 def _init_meow_hero(player):
+    global meow_hero
+
     meow_hero = objects.MeowHero(player.current_skin)
     meow_hero.rect.move_ip(int(config.WINDOW_WIDTH/2), 7*int(config.WINDOW_HEIGHT/8))
 
+
+def _decrease_timer():
+    global running
+
+    main_timer -= 1
+    if main_timer <= 0:
+        running = False
+
+
+def _check_victory():
+    global running
+    global victory
+
+    if len(enemies) == 0:
+        running = False
+        victory = True
+
+    if meow_hero.life <= 0:
+        running = False
+        victory = False
+
+
+def _decrement_invulnerability():
+    if meow_hero.invulnerability > 0:
+        meow_hero.invulnerability -= 1
+
+
+def _spawn_enemy(level_number):
+    dice = random.random()
+    if dice < spawn_proba:
+        enemy = enemy_switch_by_level(level_number)
+        enemies.append(enemy)
+
+
+def _perform_enemies_attack():
+    for enemy in enemies:
+        enemy_bullet = enemy.attack(meow_hero.rect.center)
+        if enemy_bullet is not None:
+            enemy_bullets.append(enemy_bullet)
+
+
+def _decrement_bonuses_lifetime():
+    for bonus in bonuses:
+        bonus.lifetime -= 1
+        if bonus.lifetime <= 0:
+            bonuses.remove(bonus)
+
+
+def _spawn_new_bonuses():
+    if main_timer % 10 == 0:
+        bonus = objects.Bonus("Coin", level_number)
+        bonus.rect.move_ip(random.randint(0, config.WINDOW_WIDTH), random.randint(200, config.WINDOW_HEIGHT))
+        bonuses.append(bonus)
+
+
+def _handle_keydown(event):
+    global move_right, move_left, move_down, move_up
+
+    if event.key == K_SPACE:
+        bullet = objects.Bullet(level_number)
+        bullet.rect.move_ip(meow_hero.rect.left, meow_hero.rect.top)
+        bullets.append(bullet)
+    if event.key == K_LEFT or event.key == ord('a'):
+        move_right = False
+        move_left = True
+    if event.key == K_RIGHT or event.key == ord('d'):
+        move_left = False
+        move_right = True
+    if event.key == K_UP or event.key == ord('w'):
+        move_down = False
+        move_up = True
+    if event.key == K_DOWN or event.key == ord('s'):
+        move_up = False
+        move_down = True
+
+
+def _handle_keyup(event):
+    global move_right, move_left, move_down, move_up
+    global running
+
+    if event.key == K_ESCAPE:
+        quit_state = layouts.interruption_menu(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
+        if quit_state:
+            pygame.mixer.music.stop()
+            pygame.mouse.set_visible(True)
+            running = False
+
+    if event.key == K_LEFT or event.key == ord('a'):
+        move_left = False
+    if event.key == K_RIGHT or event.key == ord('d'):
+        move_right = False
+    if event.key == K_UP or event.key == ord('w'):
+        move_up = False
+    if event.key == K_DOWN or event.key == ord('s'):
+        move_down = False
+
+
+def _move_player_around():
+    if move_left and meow_hero.rect.left > 0:
+        meow_hero.move(-1, 0)
+    if move_right and meow_hero.rect.right < config.WINDOW_WIDTH:
+        meow_hero.move(1, 0)
+    if move_up and meow_hero.rect.top > 0:
+        meow_hero.move(0, -1)
+    if move_down and meow_hero.rect.bottom < config.WINDOW_HEIGHT:
+        meow_hero.move(0, 1)
+
+
+def _hit_enemy_by_bullet():
+    for enemy in enemies:
+        for bullet in bullets:
+            if enemy.rect.colliderect(bullet.rect):
+                enemy.life -= bullet.power
+                bullet.life -= 1
+                music.attack_sound.play()
+
+
+def _hit_hero_by_enemy():
+    for enemy in enemies:
+        if meow_hero.rect.colliderect(enemy.rect) and not meow_hero.invulnerability:
+            meow_hero.life -= 1
+            meow_hero.invulnerability += 1
+            music.damage_sound.play()
+
+
+def _hit_hero_by_bullet():
+    for bullet in enemy_bullets:
+        if meow_hero.rect.colliderect(bullet.rect) and not meow_hero.invulnerability:
+            meow_hero.life -= 1
+            enemy_bullets.remove(bullet)
+            meow_hero.invulnerability += 1
+            music.damage_sound.play()
+
+
+def _collect_bonuses():
+    for bonus in bonuses:
+        if meow_hero.rect.colliderect(bonus.rect):
+            if bonus.bonus_type == "Coin":
+                score += 1000
+                music.coin_sound.play()
+            bonuses.remove(bonus)
+
+
+def _check_bullets_out_of_screen():
+    for bullet in bullets:
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+
+
+def _move_and_draw_objects(window_surface):
+    window_surface.blit(background_image_in_game, [0, 0])
+    health_points.draw(window_surface, meow_hero.life)
+
+    score_text.draw_this(window_surface, 'Score: %s' % (score), )
+    top_score_text.draw_this(window_surface, 'Top Score: %s' % (top_score))
+    timer_text.draw_this(window_surface, "Time " + str(main_timer).rjust(3) if main_timer > 0 else 'GG')
+
+    meow_hero.draw(window_surface)
+
+    for bonus in bonuses:
+        bonus.draw(window_surface)
+
+    for enemy in enemies:
+        enemy.move()
+        if enemy.rect.top > WINDOW_HEIGHT or enemy.rect.right < 0 or enemy.rect.left > config.WINDOW_WIDTH or enemy.life <= 0:
+            enemies.remove(enemy)
+            score += 100 * enemy.level
+        enemy.draw(window_surface)
+
+    for bullet in bullets:
+        bullet.move()
+        if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
+            bullets.remove(bullet)
+        bullet.draw(window_surface)
+
+    for bullet in enemy_bullets:
+        bullet.move()
+        if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
+            enemy_bullets.remove(bullet)
+        bullet.draw(window_surface)
+
+
+def _redraw_healthbar(health_bar):
+    if health_bar is not None:
+        if len(enemies):
+            health_bar.rect.topleft = enemies[0].rect.center
+            health_bar.rect.move_ip(20, 80)
+            health_bar.draw_this(window_surface, str(enemies[0].life) + '/' + str(boss_life))
+
+
+def _handle_victory(player, level_number, window_surface):
+    music.victory_sound.play()
+
+    new_skin = False
+    if level_number in config.SKIN_LEVELS and level_number not in player.skins:
+        new_skin = True
+        player.skins.append(level_number)
+
+    if score > top_score:
+        handler = open(config.HIGHT_SCORE_JSON, 'r')
+        data = json.load(handler)
+        handler.close()
+        data[str(level_number)] = [player.name, score]
+        handler = open(config.HIGHT_SCORE_JSON, 'w')
+        json.dump(data, handler)
+        handler.close()
+        layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, True, new_skin)
+    else:
+        layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, False, new_skin)
+
+    music.victory_sound.stop()
+    if level_number+1 not in player.levels:
+        player.levels.append(int(level_number+1))
+
+
+def _handle_defeat(window_surface):
+    music. game_over_sound.play()
+    layouts.defeat_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
+    music.game_over_sound.stop()
+    
 
 def __skip_buffered_events():
     for event in pygame.event.get():
