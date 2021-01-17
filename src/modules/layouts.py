@@ -7,19 +7,13 @@ from pygame.locals import *
 from time import sleep
 
 from . import interface
+from . import colors
 
 """
 Здесь рисую маленькие всплывающие окна
 Сначала отрисовывается рамка, потом окно, потом кнопки
 И прочее содержимое
 """
-
-# colors
-COLOR_WHITE = (255, 255, 255)
-COLOR_BLACK = (0, 0, 0)
-COLOR_BRIGHT_GREY = (200, 200, 200)
-COLOR_RED = (255, 0, 0)
-COLOR_BLUE = (0, 0, 255)
 
 
 # return true if quit
@@ -47,10 +41,10 @@ def interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     return True
 
-            pygame.draw.rect(window_surface, COLOR_BLACK,
+            pygame.draw.rect(window_surface, colors.BLACK,
                              (WINDOW_WIDTH / 2 + 100 - 5, WINDOW_HEIGHT / 5 - 5,
                               WINDOW_WIDTH / 3 + 10, WINDOW_HEIGHT / 2 + 10))
-            pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY,
+            pygame.draw.rect(window_surface, colors.BRIGHT_GREY,
                              (WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/5, WINDOW_WIDTH / 3, WINDOW_HEIGHT / 2))
 
             button_continue.draw(window_surface)
@@ -68,7 +62,7 @@ def stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     handler.close()
 
     for i in range(len(data)):
-        text_view = interface.TextView(font, COLOR_BLACK, WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 5 + i*48,
+        text_view = interface.TextView(font, colors.BLACK, WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 5 + i*48,
                                        data[str(i+1)][0] + "    " + str(data[str(i+1)][1]))
         drawable.append(text_view)
 
@@ -86,9 +80,9 @@ def stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     return
 
-        pygame.draw.rect(window_surface, COLOR_BLACK,
+        pygame.draw.rect(window_surface, colors.BLACK,
                          (WINDOW_WIDTH / 2 - 268, WINDOW_HEIGHT / 5 - 58, WINDOW_WIDTH / 3+16, 3 * WINDOW_HEIGHT / 4+16))
-        pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY,
+        pygame.draw.rect(window_surface, colors.BRIGHT_GREY,
                          (WINDOW_WIDTH / 2 - 260, WINDOW_HEIGHT / 5 - 50, WINDOW_WIDTH / 3, 3*WINDOW_HEIGHT / 4))
 
         for elem in drawable:
@@ -110,21 +104,21 @@ def victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, boss, score, new
     font1 = pygame.font.SysFont(None, 80)
     font2 = pygame.font.SysFont(None, 60)
 
-    text_victory = interface.TextView(font0, COLOR_BLACK, 150, 2*WINDOW_HEIGHT / 6, "Level complete!")
+    text_victory = interface.TextView(font0, colors.BLACK, 150, 2*WINDOW_HEIGHT / 6, "Level complete!")
     text_victory.rect.center = (WINDOW_WIDTH/2, WINDOW_HEIGHT/4)
 
     if boss:
-        text_formula = interface.TextView(font1, COLOR_BLACK, 150, 2*WINDOW_HEIGHT / 6, "Score = (score+life*1000)*100/time")
+        text_formula = interface.TextView(font1, colors.BLACK, 150, 2*WINDOW_HEIGHT / 6, "Score = (score+life*1000)*100/time")
     else:
-        text_formula = interface.TextView(font1, COLOR_BLACK, 150, 2*WINDOW_HEIGHT / 6, "Score = score + life*1000")
+        text_formula = interface.TextView(font1, colors.BLACK, 150, 2*WINDOW_HEIGHT / 6, "Score = score + life*1000")
 
     text_formula.rect.topleft = (WINDOW_WIDTH/4 - 70, WINDOW_HEIGHT/3 + 60)
 
-    text_press_esc = interface.TextView(font2, COLOR_WHITE, 150, 2 * WINDOW_HEIGHT / 6, "Press ESC to continue")
+    text_press_esc = interface.TextView(font2, colors.WHITE, 150, 2 * WINDOW_HEIGHT / 6, "Press ESC to continue")
     text_press_esc.rect.center = (4*WINDOW_WIDTH / 5, 8*WINDOW_HEIGHT / 9)
 
-    pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-    pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+    pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+    pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
     text_victory.draw(window_surface)
     text_formula.draw(window_surface)
@@ -135,13 +129,13 @@ def victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, boss, score, new
         sleep(0.5)
         new_top_sound = pygame.mixer.Sound('../sound/short_tracks/health.wav')
         new_top_sound.play()
-        text_formula.color = COLOR_RED
+        text_formula.color = colors.RED
         text_formula.next_line(100)
         text_formula.draw_this(window_surface, "New level record!")
 
     if new_skin:
         sleep(0.5)
-        text_formula.color = COLOR_BLUE
+        text_formula.color = colors.BLUE
         text_formula.next_line(100)
         text_formula.draw_this(window_surface, "New skin available!")
 
@@ -159,10 +153,10 @@ def victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, boss, score, new
 def defeat_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     font0 = pygame.font.SysFont(None, 200)
     font1 = pygame.font.SysFont(None, 80)
-    text_view_message = interface.TextView(font0, COLOR_WHITE, 150, 2*WINDOW_HEIGHT / 6,
+    text_view_message = interface.TextView(font0, colors.WHITE, 150, 2*WINDOW_HEIGHT / 6,
                                            "Game over, bro =(")
     text_view_message.draw(window_surface)
-    text_view_press_esc = interface.TextView(font1, COLOR_WHITE, WINDOW_WIDTH / 2 - 200, 3*WINDOW_HEIGHT / 5,
+    text_view_press_esc = interface.TextView(font1, colors.WHITE, WINDOW_WIDTH / 2 - 200, 3*WINDOW_HEIGHT / 5,
                                              "Press ESC to exit...")
     text_view_press_esc.draw(window_surface)
 
@@ -191,7 +185,7 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
     font1 = pygame.font.SysFont(None, 78)
     input_box.font = font1
 
-    text_write_name = interface.TextView(font0, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Write your name here")
+    text_write_name = interface.TextView(font0, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Write your name here")
     text_write_name.rect.center = (WINDOW_WIDTH / 2, 2*WINDOW_HEIGHT / 5)
 
     button_done = interface.Button(2*WINDOW_WIDTH / 3, 4*WINDOW_HEIGHT / 8,
@@ -246,8 +240,8 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
 
         input_box.update()
 
-        pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-        pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+        pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+        pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
         text_write_name.draw(window_surface)
         input_box.draw(window_surface)
@@ -269,7 +263,7 @@ def change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
 
     font0 = pygame.font.SysFont(None, 120)
 
-    text_title = interface.TextView(font0, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Select skin")
+    text_title = interface.TextView(font0, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Select skin")
     text_title.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 4)
 
     skin_levels = [1, 6, 8, 9, 10, 12]
@@ -303,8 +297,8 @@ def change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
                     print("Current skin is", player.current_skin)
                     return player
 
-        pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-        pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+        pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+        pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
         text_title.draw(window_surface)
 
@@ -322,15 +316,15 @@ def future_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
 
     font0 = pygame.font.SysFont(None, 120)
     font1 = pygame.font.SysFont(None, 70)
-    text_title = interface.TextView(font0, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Developers")
+    text_title = interface.TextView(font0, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Developers")
     text_title.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 4)
 
-    pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-    pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+    pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+    pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
     text_title.draw(window_surface)
 
-    text_future = interface.TextView(font1, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6)
+    text_future = interface.TextView(font1, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6)
     text_future.rect.center = (WINDOW_WIDTH / 5, WINDOW_HEIGHT / 3)
 
     text_future.next_line(82)
@@ -362,11 +356,11 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
     font1 = pygame.font.SysFont(None, 80)
     font2 = pygame.font.SysFont(None, 60)
 
-    text_victory = interface.TextView(font0, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Nice game!")
+    text_victory = interface.TextView(font0, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Nice game!")
     text_victory.rect.center = (WINDOW_WIDTH / 2, 2*WINDOW_HEIGHT / 8)
 
-    pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-    pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+    pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+    pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
     handler = open("../stats/multiplayer_score.json", 'r')
     data = json.load(handler)
@@ -374,7 +368,7 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
 
     text_victory.draw(window_surface)
 
-    score_and_time_text = interface.TextView(font1, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6)
+    score_and_time_text = interface.TextView(font1, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6)
     score_and_time_text.rect.center = (WINDOW_WIDTH / 5, WINDOW_HEIGHT / 3 + 30)
 
     score_and_time_text.draw_this(window_surface, "Your score is " + str(score))
@@ -384,7 +378,7 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
 
     handler = open("../stats/multiplayer_score.json", 'w')
 
-    score_and_time_text.color = COLOR_RED
+    score_and_time_text.color = colors.RED
     if score > data["Top score"] and time > data["Top time"]:
         score_and_time_text.draw_this(window_surface, "New top score and time!")
         data["Top score"] = score
@@ -395,7 +389,7 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
     elif time > data["Top time"]:
         score_and_time_text.draw_this(window_surface, "New top time!")
         data["Top time"] = time
-    score_and_time_text.color = COLOR_BLACK
+    score_and_time_text.color = colors.BLACK
 
     json.dump(data, handler)
     handler.close()
@@ -405,7 +399,7 @@ def two_players_victory_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT, scor
     score_and_time_text.next_line(82)
     score_and_time_text.draw_this(window_surface, "Top time: " + str(data["Top time"]))
 
-    text_press_esc = interface.TextView(font2, COLOR_WHITE, 150, 2 * WINDOW_HEIGHT / 6, "Press ESC to exit")
+    text_press_esc = interface.TextView(font2, colors.WHITE, 150, 2 * WINDOW_HEIGHT / 6, "Press ESC to exit")
     text_press_esc.rect.center = (4*WINDOW_WIDTH / 5, 7*WINDOW_HEIGHT / 8)
     text_press_esc.draw(window_surface)
 
@@ -427,7 +421,7 @@ def giving_port_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     port = random.randint(10000, 14000)
 
     font0 = pygame.font.SysFont(None, 140)
-    text_victory = interface.TextView(font0, COLOR_BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Your port is " + str(port))
+    text_victory = interface.TextView(font0, colors.BLACK, 150, 2 * WINDOW_HEIGHT / 6, "Your port is " + str(port))
     text_victory.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
 
     pygame.display.update()
@@ -448,8 +442,8 @@ def giving_port_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     return port
 
-            pygame.draw.rect(window_surface, COLOR_BLACK, rect_border)
-            pygame.draw.rect(window_surface, COLOR_BRIGHT_GREY, rect)
+            pygame.draw.rect(window_surface, colors.BLACK, rect_border)
+            pygame.draw.rect(window_surface, colors.BRIGHT_GREY, rect)
 
             text_victory.draw(window_surface)
 

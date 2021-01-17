@@ -7,6 +7,7 @@ import pygame
 from pygame.locals import *
 
 from . import interface, objects, layouts
+from . import colors
 
 """
 Всё отвечающее за игру
@@ -20,13 +21,6 @@ FPS = 40
 ENEMY_MAX_COUNT = 40
 
 SKIN_LEVELS = [1, 6, 8, 9, 10, 12]
-
-# colors
-COLOR_WHITE = (255, 255, 255)
-COLOR_BLACK = (0, 0, 0)
-COLOR_BRIGHT_GREY = (200, 200, 200)
-COLOR_RED = (255, 0, 0)
-COLOR_BLUE = (0, 0, 255)
 
 
 def terminate(player):
@@ -70,9 +64,9 @@ def story_loop(window_surface, level_number, prefix, player):
     handler.close()
 
     font = pygame.font.SysFont(None, 60)
-    text_view = interface.TextView(font, COLOR_WHITE, WINDOW_WIDTH/6+50, WINDOW_HEIGHT/10)
+    text_view = interface.TextView(font, colors.WHITE, WINDOW_WIDTH/6+50, WINDOW_HEIGHT/10)
 
-    window_surface.fill(COLOR_BLACK)
+    window_surface.fill(colors.BLACK)
 
     image = pygame.image.load('../drawable/sprites/cat_hero/skins/cat' + str(player.current_skin) + '.png')
 
@@ -155,9 +149,9 @@ def game_loop(window_surface, level_number, player):
 
     # set up text
     font = pygame.font.SysFont(None, 60)
-    score_text = interface.TextView(font, COLOR_WHITE, 10, 0)
-    top_score_text = interface.TextView(font, COLOR_WHITE, 10, 40)
-    timer_text = interface.TextView(font, COLOR_WHITE, 10*WINDOW_WIDTH/12, 10)
+    score_text = interface.TextView(font, colors.WHITE, 10, 0)
+    top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
+    timer_text = interface.TextView(font, colors.WHITE, 10*WINDOW_WIDTH/12, 10)
 
     meow_hero = objects.MeowHero(player.current_skin)
     meow_hero.rect.move_ip(int(WINDOW_WIDTH/2), 7*int(WINDOW_HEIGHT/8))
@@ -425,9 +419,9 @@ def boss_game_loop(window_surface, level_number, player):
 
     # set up text
     font = pygame.font.SysFont(None, 60)
-    score_text = interface.TextView(font, COLOR_WHITE, 10, 0)
-    top_score_text = interface.TextView(font, COLOR_WHITE, 10, 40)
-    timer_text = interface.TextView(font, COLOR_WHITE, 10 * WINDOW_WIDTH / 12, 10)
+    score_text = interface.TextView(font, colors.WHITE, 10, 0)
+    top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
+    timer_text = interface.TextView(font, colors.WHITE, 10 * WINDOW_WIDTH / 12, 10)
 
     meow_hero = objects.MeowHero(player.current_skin)
     meow_hero.rect.move_ip(int(WINDOW_WIDTH / 2), 7 * int(WINDOW_HEIGHT / 8))
@@ -475,7 +469,7 @@ def boss_game_loop(window_surface, level_number, player):
     health_bar = None
     if len(enemies) == 1:
         boss_life = enemies[0].life
-        health_bar = interface.TextView(font, COLOR_WHITE, 0, 0)
+        health_bar = interface.TextView(font, colors.WHITE, 0, 0)
 
     # setting score
     score = 0

@@ -7,6 +7,7 @@ import pygame
 from pygame.locals import *
 
 from . import objects, layouts, interface
+from . import colors
 
 """
 Game loop для двух игроков.
@@ -21,12 +22,6 @@ PORT = 9027
 FPS = 38
 TIMEOUT_TIME = 0.01
 ENEMY_MAX_COUNT = 16
-
-# colors
-COLOR_WHITE = (255, 255, 255)
-COLOR_BLACK = (0, 0, 0)
-COLOR_BRIGHT_GREY = (200, 200, 200)
-COLOR_RED = (255, 0, 0)
 
 
 def terminate():
@@ -78,13 +73,13 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
 
     # set up text
     font = pygame.font.SysFont(None, 78)
-    player1_text = interface.TextView(font, COLOR_WHITE, 10, 10, "Player 1")
-    player1_life_text = interface.TextView(font, COLOR_WHITE, 10, 80)
-    player2_text = interface.TextView(font, COLOR_WHITE, WINDOW_WIDTH*10/12, 10, "Player 2")
-    player2_life_text = interface.TextView(font, COLOR_WHITE, WINDOW_WIDTH*10/12, 80)
-    score_text = interface.TextView(font, COLOR_WHITE, WINDOW_WIDTH / 2, 72)
+    player1_text = interface.TextView(font, color.WHITE, 10, 10, "Player 1")
+    player1_life_text = interface.TextView(font, color.WHITE, 10, 80)
+    player2_text = interface.TextView(font, color.WHITE, WINDOW_WIDTH*10/12, 10, "Player 2")
+    player2_life_text = interface.TextView(font, color.WHITE, WINDOW_WIDTH*10/12, 80)
+    score_text = interface.TextView(font, color.WHITE, WINDOW_WIDTH / 2, 72)
     score_text.rect.center = (WINDOW_WIDTH/2-120, 30)
-    timer_text = interface.TextView(font, COLOR_WHITE, WINDOW_WIDTH / 2, 10)
+    timer_text = interface.TextView(font, color.WHITE, WINDOW_WIDTH / 2, 10)
     timer_text.rect.center = (WINDOW_WIDTH/2-120, 96)
 
     # spawn enemy by time
