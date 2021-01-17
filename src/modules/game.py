@@ -609,7 +609,7 @@ def boss_game_loop(window_surface, level_number, player):
         # draw enemies
         for enemy in enemies:
             enemy.move()
-            if enemy.rect.top > WINDOW_HEIGHT or enemy.life <= 0:
+            if enemy.rect.top > config.WINDOW_HEIGHT or enemy.life <= 0:
                 enemies.remove(enemy)
                 score += 100 * enemy.level
             enemy.draw(window_surface)
@@ -624,14 +624,14 @@ def boss_game_loop(window_surface, level_number, player):
         # move and draw hero bullets
         for bullet in bullets:
             bullet.move()
-            if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
+            if bullet.rect.top > config.WINDOW_HEIGHT or bullet.life <= 0:
                 bullets.remove(bullet)
             bullet.draw(window_surface)
 
         # move and draw enemy bullets
         for bullet in enemy_bullets:
             bullet.move()
-            if bullet.rect.top > WINDOW_HEIGHT or bullet.life <= 0:
+            if bullet.rect.top > config.WINDOW_HEIGHT or bullet.life <= 0:
                 enemy_bullets.remove(bullet)
             bullet.draw(window_surface)
 
