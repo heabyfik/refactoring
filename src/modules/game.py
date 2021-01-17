@@ -104,54 +104,44 @@ def enemy_switch_by_level(level_number):
         return objects.CatBossEnemy(level_number)
 
 
+main_clock = None
+background_image_in_game = None
+
+font = pygame.font.SysFont(None, 60)
+score_text = interface.TextView(font, colors.WHITE, 10, 0)
+top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
+timer_text = interface.TextView(font, colors.WHITE, 10*config.WINDOW_WIDTH/12, 10)
+
+main_timer = 0
+score = 0
+top_score = 0
+
+bullets = []
+enemies = []
+bonuses = []
+enemy_bullets = []
+
+move_left = move_right = move_up = move_down = False
+
+meow_hero = None
+health_points = objects.Health(1, config.WINDOW_WIDTH/30, config.WINDOW_HEIGHT/30)
+
+
 def game_loop(window_surface, level_number, player):
     pygame.mouse.set_visible(False)
 
-    main_clock = pygame.time.Clock()
-    pygame.time.set_timer(pygame.USEREVENT, 500)
+    _set_timer()
+    _set_background(level_number)
+    _start_music(level_number)
+    _preload_top_score(level_number)
+    _init_meow_hero(player)
 
-    # set up background
-    try:
-        background_image_in_game = pygame.image.load("../drawable/backgrounds/background" + str(level_number) + ".jpg")
-    except Exception:
-        background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
-    background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-
-    try:
-        pygame.mixer.music.load('../sound/background_music/music' + str(level_number) + ".mp3")
-    except Exception:
-        pygame.mixer.music.load("../sound/main_theme.mp3")
-
-    # set up text
-    font = pygame.font.SysFont(None, 60)
-    score_text = interface.TextView(font, colors.WHITE, 10, 0)
-    top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
-    timer_text = interface.TextView(font, colors.WHITE, 10*config.WINDOW_WIDTH/12, 10)
-
-    meow_hero = objects.MeowHero(player.current_skin)
-    meow_hero.rect.move_ip(int(config.WINDOW_WIDTH/2), 7*int(config.WINDOW_HEIGHT/8))
-
-    health_points = objects.Health(1, config.WINDOW_WIDTH/30, config.WINDOW_HEIGHT/30)
-
-    bullets = []
-    enemies = []
-    bonuses = []
-    enemy_bullets = []
-
-    # setting score
-    score = 0
-    handler = open(config.HIGHT_SCORE_JSON, 'r')
-    data = json.load(handler)
-    top_score = data[str(level_number)][1]
-    handler.close()
-
-    # setting spawn probability and level time
     enemy_spawn_proba = {2:1, 3:0.9, 8:0.42, 11:0.20}
     spawn_proba = enemy_spawn_proba[int(level_number)]
-    # main_timer = 50
+
+    global main_timer
     main_timer = 10*level_number + 60
 
-    move_left = move_right = move_up = move_down = False
     pygame.mixer.music.play(-1, 0.0)
 
     running = True
@@ -368,83 +358,14 @@ def game_loop(window_surface, level_number, player):
 def boss_game_loop(window_surface, level_number, player):
     pygame.mouse.set_visible(False)
 
-    main_clock = pygame.time.Clock()
-    pygame.time.set_timer(pygame.USEREVENT, 500)
+    _set_timer()
+    _set_background(level_number)
+    _start_music(level_number)
+    _preload_top_score(level_number)
+    _set_bosses(level_number)
+    _init_meow_hero(player)
 
-    # set up background
-    try:
-        background_image_in_game = pygame.image.load("../drawable/backgrounds/background" + str(level_number) + ".jpg")
-    except Exception:
-        background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
-    background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-
-    try:
-        pygame.mixer.music.load('../sound/background_music/music' + str(level_number) + ".mp3")
-    except Exception:
-        pygame.mixer.music.load("../sound/main_theme.mp3")
-
-    # set up text
-    font = pygame.font.SysFont(None, 60)
-    score_text = interface.TextView(font, colors.WHITE, 10, 0)
-    top_score_text = interface.TextView(font, colors.WHITE, 10, 40)
-    timer_text = interface.TextView(font, colors.WHITE, 10 * config.WINDOW_WIDTH / 12, 10)
-
-    meow_hero = objects.MeowHero(player.current_skin)
-    meow_hero.rect.move_ip(int(config.WINDOW_WIDTH / 2), 7 * int(config.WINDOW_HEIGHT / 8))
-
-    health_points = objects.Health(1, config.WINDOW_WIDTH / 30, config.WINDOW_HEIGHT / 30)
-
-    bullets = []
-    enemies = []
-    bonuses = []
-    enemy_bullets = []
-
-    main_timer = 0
-
-    # set up bosses
-    if level_number == 1:
-        enemy = objects.AngryManBoss(level_number)
-        enemies.append(enemy)
-    elif level_number == 4:
-        enemy = objects.ExamBoss(level_number)
-        enemies.append(enemy)
-    elif level_number == 5:
-        enemy = objects.CommitteeBoss(level_number)
-        enemies.append(enemy)
-    elif level_number == 6:
-        for i in range(4):
-            enemy = objects.TeacherBoss(level_number, str(i+1))
-            enemy.rect.move_ip(i*300, 0)
-            enemies.append(enemy)
-    elif level_number == 7:
-        enemy = objects.EjudjeBoss(level_number)
-        enemies.append(enemy)
-    elif level_number == 9:
-        enemy = objects.DedMorozBoss(level_number)
-        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
-        enemies.append(enemy)
-    elif level_number == 10:
-        enemy = objects.DiplomCommitteeBoss(level_number)
-        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
-        enemies.append(enemy)
-    elif level_number == 12:
-        enemy = objects.OlegAlexeevichBoss(level_number)
-        enemies.append(enemy)
-
-    # define healthbar
-    health_bar = None
-    if len(enemies) == 1:
-        boss_life = enemies[0].life
-        health_bar = interface.TextView(font, colors.WHITE, 0, 0)
-
-    # setting score
-    score = 0
-    handler = open(config.HIGHT_SCORE_JSON, 'r')
-    data = json.load(handler)
-    top_score = data[str(level_number)][1]
-    handler.close()
-
-    move_left = move_right = move_up = move_down = False
+    health_bar = _init_healthbar()
     pygame.mixer.music.play(-1, 0.0)
 
     running = True
@@ -659,3 +580,82 @@ def boss_game_loop(window_surface, level_number, player):
     pygame.display.update()
 
     return True if victory else False
+
+def _set_timer():
+    global main_clock
+
+    main_clock = pygame.time.Clock()
+    pygame.time.set_timer(pygame.USEREVENT, 500)
+
+
+def _start_music(level_number):
+    try:
+        pygame.mixer.music.load('../sound/background_music/music' + str(level_number) + ".mp3")
+    except Exception:
+        pygame.mixer.music.load("../sound/main_theme.mp3")
+
+
+def _set_background(level_number):
+    global background_image_in_game
+
+    try:
+        background_image_in_game = pygame.image.load("../drawable/backgrounds/background" + str(level_number) + ".jpg")
+    except Exception:
+        background_image_in_game = pygame.image.load("../drawable/backgrounds/abstract_background.jpg")
+
+    background_image_in_game = pygame.transform.scale(background_image_in_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
+
+
+def _preload_top_score(level_number):
+    global top_score
+
+    handler = open(config.HIGHT_SCORE_JSON, 'r')
+    data = json.load(handler)
+    top_score = data[str(level_number)][1]
+    handler.close()
+
+
+def _set_bosses(level_number):
+    global enemies
+
+    if level_number == 1:
+        enemy = objects.AngryManBoss(level_number)
+        enemies.append(enemy)
+    elif level_number == 4:
+        enemy = objects.ExamBoss(level_number)
+        enemies.append(enemy)
+    elif level_number == 5:
+        enemy = objects.CommitteeBoss(level_number)
+        enemies.append(enemy)
+    elif level_number == 6:
+        for i in range(4):
+            enemy = objects.TeacherBoss(level_number, str(i+1))
+            enemy.rect.move_ip(i*300, 0)
+            enemies.append(enemy)
+    elif level_number == 7:
+        enemy = objects.EjudjeBoss(level_number)
+        enemies.append(enemy)
+    elif level_number == 9:
+        enemy = objects.DedMorozBoss(level_number)
+        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
+        enemies.append(enemy)
+    elif level_number == 10:
+        enemy = objects.DiplomCommitteeBoss(level_number)
+        enemy.rect.move_ip(config.WINDOW_WIDTH/2, 0)
+        enemies.append(enemy)
+    elif level_number == 12:
+        enemy = objects.OlegAlexeevichBoss(level_number)
+        enemies.append(enemy)
+
+
+def _init_healthbar():
+    if len(enemies) == 1:
+        boss_life = enemies[0].life
+        health_bar = interface.TextView(font, colors.WHITE, 0, 0)
+
+        return healthbar
+
+
+def init_meow_hero(player):
+    meow_hero = objects.MeowHero(player.current_skin)
+    meow_hero.rect.move_ip(int(config.WINDOW_WIDTH/2), 7*int(config.WINDOW_HEIGHT/8))
