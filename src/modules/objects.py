@@ -117,13 +117,12 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, name, level):
+    def __init__(self, level):
         super().__init__()
 
         self.w = int(WINDOW_WIDTH / 14)  # by default
         self.h = int(WINDOW_HEIGHT / 14)  # by default
 
-        self.name = name
         self.level = level
 
         self.life = level
@@ -153,13 +152,13 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class CommonEnemy(Enemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
 
 class ChildrenEnemy(CommonEnemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 12)
         self.h = int(WINDOW_HEIGHT / 8)
@@ -184,8 +183,8 @@ class ChildrenEnemy(CommonEnemy):
 
 
 class DogEnemy(CommonEnemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 12)
         self.h = int(WINDOW_HEIGHT / 12)
@@ -211,8 +210,8 @@ class DogEnemy(CommonEnemy):
 
 
 class DancingCatEnemy(CommonEnemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 12)
         self.h = int(WINDOW_HEIGHT / 12)
@@ -253,8 +252,8 @@ class DancingCatEnemy(CommonEnemy):
 
 
 class CatBossEnemy(CommonEnemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 10)
         self.h = int(WINDOW_HEIGHT / 6)
@@ -286,8 +285,8 @@ class CatBossEnemy(CommonEnemy):
 
 
 class DogEnemyMultiplayer(Enemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.reload_time = 10
         self.reload = random.randint(0, 8)
@@ -308,8 +307,8 @@ class DogEnemyMultiplayer(Enemy):
 
 
 class Boss(Enemy):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         # bosses are bigger
         self.w = int(WINDOW_WIDTH / 5)
@@ -353,8 +352,8 @@ class Boss(Enemy):
 
 
 class AngryManBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/zloy_muzhic.png')
 
@@ -374,8 +373,8 @@ class AngryManBoss(Boss):
 
 
 class ExamBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 3)
         self.h = int(WINDOW_HEIGHT / 5)
@@ -404,8 +403,8 @@ class ExamBoss(Boss):
 
 
 class CommitteeBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 3)
         self.h = int(WINDOW_HEIGHT / 5)
@@ -433,8 +432,8 @@ class CommitteeBoss(Boss):
 
 
 class DedMorozBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 5)
         self.h = int(WINDOW_HEIGHT / 5)
@@ -475,8 +474,8 @@ class DedMorozBoss(Boss):
 
 
 class EjudjeBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.image = pygame.image.load('../drawable/sprites/enemy/bosses/ejudje/ejudje8.png')
         self.cur_num = 8
@@ -513,8 +512,8 @@ class EjudjeBoss(Boss):
 
 
 class TeacherBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level, name):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 14)
         self.h = int(WINDOW_HEIGHT / 8)
@@ -598,15 +597,13 @@ class TeacherBoss(Boss):
 
 
 class OlegAlexeevichBoss(Boss):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.w = int(WINDOW_WIDTH / 3)
         self.h = int(WINDOW_HEIGHT / 5)
 
         image = pygame.image.load('../drawable/sprites/enemy/bosses/teachers/teachers6.png')
-
-        # self.life = 300
 
         self.image_surface = pygame.transform.scale(image, (self.w, self.h))
         self.rect = self.image_surface.get_rect()
@@ -625,8 +622,8 @@ class OlegAlexeevichBoss(Boss):
 
 
 class DiplomCommittee(Teacher):
-    def __init__(self, name, level):
-        super().__init__(name, level)
+    def __init__(self, level):
+        super().__init__(level)
 
         self.reload_time = 3
 

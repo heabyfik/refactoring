@@ -134,7 +134,7 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                     dice = random.random()
                     if dice < enemy_spawn_probability:
                         level = random.randint(1, available_enemy_level)
-                        enemy = objects.DogEnemyMultiplayer("Dog Enemy" + str(level), level)
+                        enemy = objects.DogEnemyMultiplayer(level)
                         enemy.rect.move_ip(random.randint(0, WINDOW_WIDTH), 0)
                         enemies.append(enemy)
 
