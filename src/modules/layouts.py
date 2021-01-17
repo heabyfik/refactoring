@@ -56,7 +56,7 @@ def stats_layout(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
     font = pygame.font.SysFont(None, 46)
     drawable = list()
 
-    handler = open("../stats/high_score.json", 'r')
+    handler = open(config.HIGHT_SCORE_JSON, 'r')
     data = json.load(handler)
     handler.close()
 

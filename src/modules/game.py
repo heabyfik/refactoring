@@ -152,7 +152,7 @@ def game_loop(window_surface, level_number, player):
 
     # setting score
     score = 0
-    handler = open("../stats/high_score.json", 'r')
+    handler = open(config.HIGHT_SCORE_JSON, 'r')
     data = json.load(handler)
     top_score = data[str(level_number)][1]
     handler.close()
@@ -353,11 +353,11 @@ def game_loop(window_surface, level_number, player):
             player.skins.append(level_number)
 
         if score > top_score:
-            handler = open("../stats/high_score.json", 'r')
+            handler = open(config.HIGHT_SCORE_JSON, 'r')
             data = json.load(handler)
             handler.close()
             data[str(level_number)] = [player.name, score]
-            handler = open("../stats/high_score.json", 'w')
+            handler = open(config.HIGHT_SCORE_JSON, 'w')
             json.dump(data, handler)
             handler.close()
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, False, score, True, new_skin)
@@ -459,7 +459,7 @@ def boss_game_loop(window_surface, level_number, player):
 
     # setting score
     score = 0
-    handler = open("../stats/high_score.json", 'r')
+    handler = open(config.HIGHT_SCORE_JSON, 'r')
     data = json.load(handler)
     top_score = data[str(level_number)][1]
     handler.close()
@@ -657,11 +657,11 @@ def boss_game_loop(window_surface, level_number, player):
             player.skins.append(level_number)
 
         if score > top_score:
-            handler = open("../stats/high_score.json", 'r')
+            handler = open(config.HIGHT_SCORE_JSON, 'r')
             data = json.load(handler)
             handler.close()
             data[str(level_number)] = [player.name, score]
-            handler = open("../stats/high_score.json", 'w')
+            handler = open(config.HIGHT_SCORE_JSON, 'w')
             json.dump(data, handler)
             handler.close()
             layouts.victory_layout(window_surface, config.WINDOW_WIDTH, config.WINDOW_HEIGHT, True, score, True, new_skin)
