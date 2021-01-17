@@ -200,17 +200,14 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
 
             if button_done.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    print(input_box.text)
                     name = input_box.text.strip()
                     if not name:
                         done = True
                         continue
                     path = '../stats/players/' + name + '.json'
                     if os.path.isfile(path):
-                        print("Exist")
                         player = interface.load_player_by_path(path)
                     else:
-                        print("Not exist")
                         interface.create_empty_profile(name)
                         player = interface.load_player_by_path(path)
                     input_box.text = ''
@@ -220,17 +217,14 @@ def create_profile_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
                 if event.key == K_ESCAPE:
                     done = True
                 elif event.key == pygame.K_RETURN:  # if enter
-                    print(input_box.text)
                     name = input_box.text.strip()
                     if not name:
                         done = True
                         continue
                     path = '../stats/players/' + name + '.json'
                     if os.path.isfile(path):
-                        print("Exist")
                         player = interface.load_player_by_path(path)
                     else:
-                        print("Not exist")
                         interface.create_empty_profile(name)
                         player = interface.load_player_by_path(path)
                     input_box.text = ''
@@ -294,7 +288,6 @@ def change_skin_layout(window_surface, player, WINDOW_WIDTH, WINDOW_HEIGHT):
             if button.is_over(mouse_pos):
                 if event.type == pygame.MOUSEBUTTONDOWN and not button.is_off:
                     player.current_skin = int(button.text)
-                    print("Current skin is", player.current_skin)
                     return player
 
         pygame.draw.rect(window_surface, colors.BLACK, rect_border)

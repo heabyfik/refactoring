@@ -25,6 +25,7 @@ ENEMY_MAX_COUNT = 16
 
 
 def terminate():
+    print("Goodbye")
     pygame.quit()
     sys.exit(0)
 
@@ -116,7 +117,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
         score += 1*k  # increase score
         for event in pygame.event.get():
             if event.type == QUIT:
-                print("Goodbye")
                 terminate()
 
             if event.type == pygame.USEREVENT:  # time tick
@@ -186,7 +186,6 @@ def two_players_mode(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT):
                 if event.key == K_ESCAPE:
                     quit_state = layouts.interruption_menu(window_surface, WINDOW_WIDTH, WINDOW_HEIGHT)
                     if quit_state:
-                        print("Goodbye")
                         pygame.mixer.music.stop()
                         pygame.mouse.set_visible(True)
                         return False

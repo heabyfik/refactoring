@@ -25,7 +25,6 @@ SKIN_LEVELS = [1, 6, 8, 9, 10, 12]
 
 def terminate(player):
     # saving current state
-    print("Levels:", player.levels)
     handler = open("../stats/last_player.txt", 'w')
     handler.write(player.name)
     handler.close()
@@ -120,8 +119,6 @@ def enemy_switch_by_level(level_number):
 
 
 def game_loop(window_surface, level_number, player):
-    print(player.name)
-    print(level_number)
     pygame.mouse.set_visible(False)
 
     main_clock = pygame.time.Clock()
@@ -390,7 +387,6 @@ def game_loop(window_surface, level_number, player):
 
 
 def boss_game_loop(window_surface, level_number, player):
-    print(player.name)
     pygame.mouse.set_visible(False)
 
     main_clock = pygame.time.Clock()

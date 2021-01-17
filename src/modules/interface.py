@@ -171,15 +171,6 @@ def main():
             if event.type == pygame.QUIT:
                 return False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = event.pos  # gets mouse position
-
-                # checks if mouse position is over the button
-
-                if button.is_over(mouse_pos):
-                    # prints current location of mouse
-                    print('button was pressed at {0}'.format(mouse_pos))
-
         screen.fill(bg)
 
         button.draw(window_surface)
